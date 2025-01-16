@@ -1,6 +1,6 @@
 # Citadel 🛡️
 
-Citadel is a payload analysis framework that I built to enable me to review payloads prior to using them on engagements. The inner PE parsing logic will also be used for future projects and will act as a core component to my research projects.
+Citadel is a payload analysis framework that I built to enable me to review payloads prior to using them on engagements. The inner PE parsing logic will also be used for future projects and will act as a core component to my research projects. My extension of the preprocessing phase and the addition of the capability detectors, Citadel will report on [MITRE ATT&CK](https://attack.mitre.org/) and [Malware Behavior Catalog](https://github.com/MBCProject/mbc-markdown).
 
 ## 🎯 Overview
 
@@ -30,7 +30,7 @@ pip install .
 
 ## 🔗 Capability Detectors
 
-| Project                  | Description                                 | Link                                                                   |
-| ------------------------ | ------------------------------------------- | ---------------------------------------------------------------------- |
-| capa                     | Automatically identify malware capabilities | [capa](https://github.com/mandiant/capa)                               |
-| Malware Behavior Catalog | Malware Behavior Catalog                    | [Malware Behavior Catalog](https://github.com/MBCProject/mbc-markdown) |
+| Project                                                                | Description                                                                                                                                                                                                    |
+| ---------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [capa](https://github.com/mandiant/capa)                               | Automatically identify malware capabilities                                                                                                                                                                    |
+| [Malware Behavior Catalog](https://github.com/MBCProject/mbc-markdown) | The Malware Behavior Catalog (MBC) is a catalog of malware objectives and behaviors, created to support malware analysis-oriented use cases, such as labeling, similarity analysis, and standardized reporting |
