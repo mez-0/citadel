@@ -19,7 +19,7 @@ source venv/bin/activate
 pip install .
 ```
 
-🔧 Parsers
+## 🔧 Parsers
 
 | Parser         | Description                                                                                | Link                                                        |
 | -------------- | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------- |
@@ -28,7 +28,7 @@ pip install .
 | Radare2        | For detailed binary analysis, including sections, imports, exports, functions, and strings | [Radare2](https://github.com/radareorg/radare2)             |
 | Detect-It-Easy | For identifying compilers, libraries, linkers, packers, and tools                          | [Detect-It-Easy](https://github.com/horsicq/Detect-It-Easy) |
 
-🔗 Related Projects
+## 🔗 Capability Detectors
 
 | Project                  | Description                                 | Link                                                                   |
 | ------------------------ | ------------------------------------------- | ---------------------------------------------------------------------- |
