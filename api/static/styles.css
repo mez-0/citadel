@@ -1,0 +1,87 @@
+:root {
+    --airbnb-red: #FF5A5F;
+    --airbnb-teal: #00A699;
+    --airbnb-yellow: #FCB001;
+    --airbnb-orange: #FC642D;
+    --text-primary: #484848;
+    --text-secondary: #767676;
+    --border-color: #EBEBEB;
+    --background-light: #F7F7F7;
+    --background-white: #fff;
+    --shadow-card: 0 2px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* Base Styles */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background-color: var(--background-light);
+    color: var(--text-primary);
+}
+
+/* Typography */
+.page-title {
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.subtitle {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+}
+
+/* Navigation Tabs */
+.nav-tabs {
+    border-bottom: 2px solid var(--border-color);
+    margin-bottom: 1rem;
+}
+
+.nav-tabs .nav-link {
+    color: var(--text-secondary);
+    border: none;
+    padding: 0.75rem 1rem;
+    margin-right: 1rem;
+    font-weight: 500;
+}
+
+.nav-tabs .nav-link:hover {
+    color: var(--airbnb-red);
+    border: none;
+}
+
+.nav-tabs .nav-link.active {
+    color: var(--airbnb-red);
+    border: none;
+    border-bottom: 2px solid var(--airbnb-red);
+}
+
+/* Code Blocks */
+pre {
+    background: var(--background-light);
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 0;
+}
+
+/* Tables */
+.table {
+    width: 100%;
+    margin: 1.5rem 0;
+    border-collapse: collapse;
+}
+
+.table th,
+.table td {
+    padding: 0.75rem;
+    border: 1px solid #d1d5da;
+    text-align: left;
+}
+
+.table thead th {
+    background-color: #f6f8fa;
+    font-weight: bold;
+}
+
+.table-bordered {
+    border: 1px solid #d1d5da;
+}
