@@ -7,7 +7,7 @@ from citadel import logger
 from citadel.arguments import get_args
 from citadel.db import CitadelDatabaseApi
 from citadel.enums import MONGO_COLLECTIONS
-from citadel.file_parser import get_pe_info
+from citadel.file_parser import get_payload_info
 from citadel.models.PayloadFile import PayloadFile
 from citadel.models.Task import TASK_STATUS, Task
 from citadel.preprocess import pre_process
@@ -105,13 +105,13 @@ async def main():
     for file in files:
         logger.info(f"Processing file: [bold blue]{file}")
 
-        pe_info = get_pe_info(file)
+        payload_info = get_payload_info(file)
 
-        if not pe_info:
+        if not payload_info:
             logger.bad(f"Failed to parse PE file: {file}")
             continue
 
-        task = await add_file_to_db(api, file, pe_info, args)
+        task = await add_file_to_db(api, file, payload_info, args)
         if task:
             new_tasks.append(task)
         else:
