@@ -1,19 +1,20 @@
 import json
 import os
+import zipfile
 from pathlib import Path
+
+import requests
 
 from citadel import logger
 from citadel.models.Capa import CapaReport, MalwareBehaviourCatalog, MitreTechnique
 
 CAPA_OUTPUT_FILE = Path("/tmp/capa.json")
-CAPA_RULES_DIR = Path("/tmp/capa-rules")
 CAPA_BASE_DIR = Path("/tmp/capa")
-CAPA_SIGS_DIR = CAPA_BASE_DIR / "sigs"
-CAPA_RULES_URL = "https://github.com/mandiant/capa-rules"
-CAPA_REPO_URL = "https://github.com/mandiant/capa"
+CAPA_ZIP_FILE = Path("/tmp/capa.zip")
+CAPA_ELF = CAPA_BASE_DIR / "capa"
 
 
-def clone_repo(url: str, location: str) -> bool:
+def downlod_capa_release() -> bool:
     """
     clone a given repo
 
@@ -25,41 +26,88 @@ def clone_repo(url: str, location: str) -> bool:
     :rtype: bool
     """
 
-    if os.system(f"git clone {url} {location}") == 0:
+    url = "https://github.com/mandiant/capa/releases/download/v9.0.0/capa-v9.0.0-linux.zip"
+
+    if CAPA_ZIP_FILE.exists():
         return True
-    else:
-        logger.bad(f"Error cloning repo: {url}")
+
+    try:
+        r = requests.get(url)
+        with open(CAPA_ZIP_FILE.resolve(), "wb") as f:
+            f.write(r.content)
+        return True
+    except Exception as e:
+        logger.bad(f"Error downloading capa release: {e}")
         return False
 
 
-def clone_prereqs() -> bool:
+def unzip_capa_release() -> bool:
     """
-    clone all the prerequisites for capa
+    clone a given repo
 
-    :return: whether the prerequisites were cloned successfully
+    :param url: the url of the repo to clone
+    :type url: str
+    :param location: the location to clone the repo to
+    :type location: str
+    :return: whether the repo was cloned successfully
     :rtype: bool
     """
 
-    if CAPA_BASE_DIR.exists() and CAPA_SIGS_DIR.exists() and CAPA_RULES_DIR.exists():
-        return True
-
-    if not CAPA_BASE_DIR.exists():
-        if clone_repo(CAPA_REPO_URL, CAPA_BASE_DIR):
-            return True
-        else:
-            logger.bad("Failed to clone capa repo")
-            return False
-
-    if not CAPA_SIGS_DIR.exists():
-        logger.bad("Failed to find capa sigs directory")
+    if not CAPA_ZIP_FILE.exists():
+        logger.bad("capa zip file does not exist")
         return False
 
-    if not CAPA_RULES_DIR.exists():
-        if clone_repo(CAPA_RULES_URL, CAPA_RULES_DIR):
-            return True
-        else:
-            logger.bad("Failed to clone capa rules repo")
-            return False
+    try:
+        with zipfile.ZipFile(CAPA_ZIP_FILE.resolve(), "r") as zip_ref:
+            zip_ref.extractall(CAPA_BASE_DIR.resolve())
+        return True
+    except Exception as e:
+        logger.bad(f"Error unzipping capa release: {e}")
+        return False
+
+
+def chmod_capa() -> bool:
+    """
+    change the permissions of the capa binary
+
+    :return: whether the permissions were changed successfully
+    :rtype: bool
+    """
+
+    if not CAPA_ELF.exists():
+        logger.bad("capa binary does not exist")
+        return False
+
+    try:
+        os.system(f"chmod +x {CAPA_ELF.resolve()}")
+        return True
+    except Exception as e:
+        logger.bad(f"Error changing permissions of capa binary: {e}")
+        return False
+
+
+def install_capa() -> bool:
+    """
+    install capa
+
+    :return: whether capa was installed successfully
+    :rtype: bool
+    """
+
+    if CAPA_ELF.exists():
+        return True
+
+    if not downlod_capa_release():
+        logger.bad("Error downloading capa release")
+        return False
+
+    if not unzip_capa_release():
+        logger.bad("Error unzipping capa release")
+        return False
+
+    if not chmod_capa():
+        logger.bad("Error changing permissions of capa binary")
+        return False
 
     return True
 
@@ -78,12 +126,16 @@ def execute_capa(p: str) -> bool:
     # until its not terrible, im wrapping it up.
     # ps. the output is probably less useful than this.,..
 
-    cmd = f"capa -vv {p} -r {str(CAPA_RULES_DIR.resolve())} --signatures {str(CAPA_SIGS_DIR.resolve())} --json --os windows --format auto --color never --quiet > {CAPA_OUTPUT_FILE} 2>&1"
+    cmd = f"{CAPA_ELF.resolve()} -vv {p} --json --os windows --format auto --color never --quiet > {CAPA_OUTPUT_FILE} 2>&1"
 
     if CAPA_OUTPUT_FILE.exists():
         CAPA_OUTPUT_FILE.unlink()
 
-    if not clone_prereqs():
+    if not install_capa():
+        return False
+
+    if not CAPA_ELF.exists():
+        logger.bad("capa binary does not exist")
         return False
 
     try:

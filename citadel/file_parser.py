@@ -1,9 +1,9 @@
 from citadel.models.PayloadFile import PayloadFile
 from citadel.pe.meta import get_entropy_from_base64_string
-from citadel.pe.parser import get_pe_object
+from citadel.pe.parser import get_all_payload_ifo
 
 
-def get_pe_info(file: str) -> PayloadFile:
+def get_payload_info(file: str) -> PayloadFile:
     """
     get the PE info from the file
 
@@ -13,7 +13,7 @@ def get_pe_info(file: str) -> PayloadFile:
     :rtype: PayloadFile
     """
 
-    return get_pe_object(file)
+    return get_all_payload_ifo(file)
 
 
 def get_malicious_bytes_entropy(base64: str) -> float:

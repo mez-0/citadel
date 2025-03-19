@@ -13,12 +13,18 @@ from citadel.pe.pefile import parse_pe
 from citadel.pe.radare2 import get_radare_data
 
 
-def get_pe_object(file_path: str) -> PayloadFile:
+def get_all_payload_ifo(
+    file_path: str, ignore_functions: bool = False, no_logging: bool = False
+) -> PayloadFile:
     """
     parse a pe file using radare2 and pefile
 
     :param file_path: path to the file
     :type file_path: str
+    :param ignore_functions: whether to ignore functions or not
+    :type ignore_functions: bool
+    :param no_logging: whether to log or not
+    :type no_logging: bool
     :return: a binary file object
     :rtype: BinaryFile
     """
@@ -33,41 +39,60 @@ def get_pe_object(file_path: str) -> PayloadFile:
         internal_name=get_internal_file_name(file_path),
     )
 
-    radare2_binary_file = get_radare_data(file_path)
+    try:
+        radare2_binary_file = get_radare_data(file_path)
 
-    if radare2_binary_file:
-        base_model.architecture = radare2_binary_file.architecture
-        base_model.entrypoint = radare2_binary_file.entrypoint
-        base_model.imports = radare2_binary_file.imports
-        base_model.exports = radare2_binary_file.exports
-        base_model.sections = radare2_binary_file.sections
-        base_model.strings = radare2_binary_file.strings
-        base_model.functions = radare2_binary_file.functions
-        logger.good(f"Successfully updated model with radare2", indent=1)
-    else:
-        logger.warning(f"Failed to update model with radare2", indent=1)
+        if radare2_binary_file:
+            base_model.architecture = radare2_binary_file.architecture
+            base_model.entrypoint = radare2_binary_file.entrypoint
+            base_model.imports = radare2_binary_file.imports
+            base_model.exports = radare2_binary_file.exports
+            base_model.sections = radare2_binary_file.sections
+            base_model.strings = radare2_binary_file.strings
+            if not ignore_functions:
+                base_model.functions = radare2_binary_file.functions
+            if not no_logging:
+                logger.good(f"Successfully updated model with radare2", indent=1)
+        else:
+            if not no_logging:
+                logger.warning(f"Failed to update model with radare2", indent=1)
+    except Exception as e:
+        if not no_logging:
+            logger.bad(f"Error updating model with radare2: {e}", indent=1)
 
-    pe_binary_file = parse_pe(file_path)
+    try:
+        pe_binary_file = parse_pe(file_path)
 
-    if pe_binary_file:
-        base_model.optional_headers = pe_binary_file.optional_headers
-        base_model.timestamp = pe_binary_file.timestamp
-        base_model.certificates = pe_binary_file.certificates
-        logger.good(f"Successfully updated model with pefile", indent=1)
-    else:
-        logger.warning(f"Failed to update model with pefile", indent=1)
+        if pe_binary_file:
+            base_model.optional_headers = pe_binary_file.optional_headers
+            base_model.timestamp = pe_binary_file.timestamp
+            base_model.certificates = pe_binary_file.certificates
+            if not no_logging:
+                logger.good(f"Successfully updated model with pefile", indent=1)
+        else:
+            if not no_logging:
+                logger.warning(f"Failed to update model with pefile", indent=1)
+    except Exception as e:
+        if not no_logging:
+            logger.bad(f"Error updating model with pefile: {e}", indent=1)
 
-    die_binary_file = get_die_data(file_path)
+    try:
+        die_binary_file = get_die_data(file_path)
 
-    if die_binary_file:
-        base_model.compilers = die_binary_file.compilers
-        base_model.libraries = die_binary_file.libraries
-        base_model.linkers = die_binary_file.linkers
-        base_model.packers = die_binary_file.packers
-        base_model.sign_tools = die_binary_file.sign_tools
-        base_model.tools = die_binary_file.tools
-        logger.good(f"Successfully updated model with die", indent=1)
-    else:
-        logger.warning(f"Failed to update model with die", indent=1)
+        if die_binary_file:
+            base_model.compilers = die_binary_file.compilers
+            base_model.libraries = die_binary_file.libraries
+            base_model.linkers = die_binary_file.linkers
+            base_model.packers = die_binary_file.packers
+            base_model.sign_tools = die_binary_file.sign_tools
+            base_model.tools = die_binary_file.tools
+            if not no_logging:
+                logger.good(f"Successfully updated model with die", indent=1)
+        else:
+            if not no_logging:
+                logger.warning(f"Failed to update model with die", indent=1)
+    except Exception as e:
+        if not no_logging:
+            logger.bad(f"Error updating model with die: {e}", indent=1)
 
     return base_model
