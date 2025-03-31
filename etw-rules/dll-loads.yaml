@@ -1,0 +1,10 @@
+rule:
+  name: "Image Load"
+  provider: "Windows Kernel"
+  task: "Image"
+  opcode: "Load"
+  fields:
+    - ImageBase
+    - ImageSize
+    - TimeDateStamp
+    - FileName

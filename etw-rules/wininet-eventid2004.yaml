@@ -1,0 +1,9 @@
+rule:
+  name: "WinINet EventID 2004"
+  provider: "Microsoft-Windows-WinINet-Capture"
+  task: "EventID(2004)"
+  opcode: "Info"
+  fields:
+    - 44786
+    - Flags
+    - Payload

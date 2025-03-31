@@ -1,0 +1,11 @@
+rule:
+  name: "WinINet Connect Handle Created"
+  provider: "Microsoft-Windows-WinINet"
+  task: "WININET_CONNECT_HANDLE_CREATED"
+  opcode: "Info"
+  fields:
+    - ConnectionHandle
+    - ParentHandle
+    - ServerName
+    - ServerPort
+    - Service

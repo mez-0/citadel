@@ -1,0 +1,10 @@
+rule:
+  name: "VirtualAlloc"
+  provider: "Windows Kernel"
+  task: "VirtualMem"
+  opcode: "Alloc"
+  fields:
+    - BaseAddr
+    - Length
+    - Flags
+    - EndAddr

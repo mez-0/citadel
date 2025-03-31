@@ -1,0 +1,15 @@
+rule:
+  name: "Thread Stop"
+  provider: "Windows Kernel"
+  task: "Thread"
+  opcode: "Stop"
+  fields:
+    - StackBase
+    - StackLimit
+    - UserStackBase
+    - StartAddr
+    - Win32StartAddr
+    - TebBase
+    - ThreadName
+    - ParentThreadID
+    - ParentProcessID

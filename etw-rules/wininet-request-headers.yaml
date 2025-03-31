@@ -1,0 +1,8 @@
+rule:
+  name: "WinINet Request Headers"
+  provider: "Microsoft-Windows-WinINet"
+  task: "WININET_REQUEST_HEADER"
+  opcode: "Info"
+  fields:
+    - RequestHandle
+    - Headers

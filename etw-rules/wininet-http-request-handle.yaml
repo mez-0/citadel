@@ -1,0 +1,14 @@
+rule:
+  name: "WinINet Connect Handle Created"
+  provider: "Microsoft-Windows-WinINet"
+  task: "WININET_HTTP_REQUEST_HANDLE_CREATED"
+  opcode: "Info"
+  fields:
+    - ConnectionHandle
+    - ParentHandle
+    - Verb
+    - ObjectName
+    - Version
+    - Referrer
+    - AcceptTypes
+    - Flags
