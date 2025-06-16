@@ -73,6 +73,13 @@ export interface CapaReport {
   rule: string;
 }
 
+export interface EmberResult {
+  file_path: string;
+  score: number;
+  prediction: string;
+  model_name: string;
+}
+
 // Dashboard aggregated data types
 export interface ThreatData {
   name: string;

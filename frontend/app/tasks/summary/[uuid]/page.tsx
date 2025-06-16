@@ -10,7 +10,7 @@ import { AllCommunityModule } from 'ag-grid-community';
 import '@/app/styles/tabs.css';
 import { FunctionCategoryChart, RawFunctionMapping } from '@/components/charts/FunctionCategoryChart';
 import { SimilarTLSHScatterChart, SimilarTLSHHash } from '@/components/charts/SimilarTLSHScatterChart';
-import { CapaReport, MitreTechnique, MalwareBehaviourCatalog } from '@/lib/types';
+import { CapaReport, MitreTechnique, MalwareBehaviourCatalog, EmberResult } from '@/lib/types';
 
 // Register AG-Grid modules
 if (typeof window !== 'undefined') {
@@ -96,6 +96,7 @@ interface PayloadData {
   capa_reports?: unknown[];
   similar_tlsh_hashes?: unknown[];
   yara_matches?: unknown[];
+  ember_result?: EmberResult;
   // Add missing fields for technical details
   entrypoint?: unknown[];
   certificates?: unknown[];
@@ -504,7 +505,7 @@ export default function TaskSummaryPage({ params }: { params: { uuid: string } }
                 </div>
               <div className="card-body">
                 <div className="row g-4">
-                  <div className="col-md-4">
+                  <div className="col-lg-3 col-md-6">
                     <div className="p-3 rounded-lg bg-gray-700 h-100">
                       <h6 className="text-gray-400 mb-2">Security Status</h6>
                       <div className="d-flex align-items-center">
@@ -518,7 +519,23 @@ export default function TaskSummaryPage({ params }: { params: { uuid: string } }
                       </div>
                     </div>
                   </div>
-                  <div className="col-md-4">
+                  <div className="col-lg-3 col-md-6">
+                    <div className="p-3 rounded-lg bg-gray-700 h-100">
+                      <h6 className="text-gray-400 mb-2">EMBER Analysis</h6>
+                      <div className="d-flex align-items-center">
+                        <i className={`bi ${data.ember_result?.prediction === 'benign' ? 'bi-shield-check text-success' : 'bi-exclamation-triangle text-danger'} fs-1 me-3`}></i>
+                        <div>
+                          <h3 className={`mb-1 ${data.ember_result?.prediction === 'benign' ? 'text-success' : 'text-danger'}`}>
+                            {data.ember_result?.prediction ? data.ember_result.prediction.charAt(0).toUpperCase() + data.ember_result.prediction.slice(1) : 'N/A'}
+                          </h3>
+                          <p className="text-gray-400 mb-0">
+                            Score: {data.ember_result?.score ? data.ember_result.score.toFixed(6) : 'N/A'}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-lg-3 col-md-6">
                     <div className="p-3 rounded-lg bg-gray-700 h-100">
                       <h6 className="text-gray-400 mb-2">File Characteristics</h6>
                       <ul className="list-unstyled mb-0">
@@ -537,7 +554,7 @@ export default function TaskSummaryPage({ params }: { params: { uuid: string } }
                       </ul>
                     </div>
                   </div>
-                  <div className="col-md-4">
+                  <div className="col-lg-3 col-md-6">
                     <div className="p-3 rounded-lg bg-gray-700 h-100">
                       <h6 className="text-gray-400 mb-2">Analysis Details</h6>
                       <ul className="list-unstyled mb-0">
@@ -566,6 +583,33 @@ export default function TaskSummaryPage({ params }: { params: { uuid: string } }
                               {name}
                             </span>
                           ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  {data.ember_result && (
+                    <div className="col-12 mt-3">
+                      <div className="p-3 rounded-lg bg-gray-700">
+                        <h6 className="text-info mb-3">EMBER Model Details</h6>
+                        <div className="row g-3">
+                          <div className="col-md-6">
+                            <div className="d-flex align-items-center mb-2">
+                              <i className="bi bi-cpu text-info me-2"></i>
+                              <span className="text-white">Model</span>
+                            </div>
+                            <div className="text-gray-400 small">
+                              {data.ember_result.model_name}
+                            </div>
+                          </div>
+                          <div className="col-md-6">
+                            <div className="d-flex align-items-center mb-2">
+                              <i className="bi bi-bar-chart text-info me-2"></i>
+                              <span className="text-white">Confidence Score</span>
+                            </div>
+                            <div className="text-gray-400 small">
+                              {data.ember_result.score.toFixed(6)} ({(data.ember_result.score * 100).toFixed(4)}%)
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -1224,35 +1268,35 @@ export default function TaskSummaryPage({ params }: { params: { uuid: string } }
                                         field: 'paddr', 
                                         headerName: 'Physical Address', 
                                         flex: 1,
-                                        cellRenderer: (params: any) =>
+                                        valueFormatter: (params: any) => 
                                           params.value !== undefined ? `0x${params.value.toString(16).toUpperCase()}` : '',
                                       },
                                       { 
                                         field: 'vaddr', 
                                         headerName: 'Virtual Address', 
                                         flex: 1,
-                                        cellRenderer: (params: any) =>
+                                        valueFormatter: (params: any) => 
                                           params.value !== undefined ? `0x${params.value.toString(16).toUpperCase()}` : '',
                                       },
                                       { 
                                         field: 'baddr', 
                                         headerName: 'Base Address', 
                                         flex: 1,
-                                        cellRenderer: (params: any) =>
+                                        valueFormatter: (params: any) => 
                                           params.value !== undefined ? `0x${params.value.toString(16).toUpperCase()}` : '',
                                       },
                                       { 
                                         field: 'laddr', 
                                         headerName: 'Load Address', 
                                         flex: 1,
-                                        cellRenderer: (params: any) =>
+                                        valueFormatter: (params: any) => 
                                           params.value !== undefined ? `0x${params.value.toString(16).toUpperCase()}` : '',
                                       },
                                       { 
                                         field: 'haddr', 
                                         headerName: 'High Address', 
                                         flex: 1,
-                                        cellRenderer: (params: any) =>
+                                        valueFormatter: (params: any) => 
                                           params.value !== undefined ? `0x${params.value.toString(16).toUpperCase()}` : '',
                                       },
                                       { field: 'type', headerName: 'Type', flex: 1 }
