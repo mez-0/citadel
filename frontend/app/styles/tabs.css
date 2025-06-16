@@ -21,6 +21,162 @@
   transition: all 0.2s ease-in-out;
 }
 
+/* Bootstrap Collapse Dark Theme Override - More Specific Selectors */
+.card .collapse,
+.card .collapse.show,
+.card .collapse.collapsing,
+.card .collapse:not(.show) {
+  background-color: #1f2937 !important;
+  color: #f3f4f6 !important;
+  border-color: #374151 !important;
+}
+
+/* Target all possible collapse states with maximum specificity */
+div.card div.collapse[id^="capaReport"],
+div.card div.collapse[id^="capaReport"].show,
+div.card div.collapse[id^="capaReport"].collapsing,
+div.card div.collapse[id^="capaReport"]:not(.show) {
+  background-color: #1f2937 !important;
+  color: #f3f4f6 !important;
+  border-color: #374151 !important;
+}
+
+/* Override Bootstrap's inline styles with highest specificity */
+.card .collapse[style*="background"],
+.card .collapse[style*="color"] {
+  background-color: #1f2937 !important;
+  color: #f3f4f6 !important;
+}
+
+/* Force dark theme for collapse card-body */
+.collapse .card-body,
+.collapse .card-body.bg-gray-800 {
+  background-color: #1f2937 !important;
+  color: #f3f4f6 !important;
+  border-color: #374151 !important;
+}
+
+/* Ensure all nested elements inherit the dark theme */
+.collapse .card-body *,
+.collapse .card-body .row,
+.collapse .card-body .col-12,
+.collapse .card-body .col-md-6,
+.collapse .card-body .col-md-4 {
+  background-color: transparent !important;
+  color: inherit !important;
+}
+
+/* Maintain specific color classes within collapse */
+.collapse .text-danger,
+.collapse .card-body .text-danger {
+  color: #ef4444 !important;
+}
+
+.collapse .text-success,
+.collapse .card-body .text-success {
+  color: #10b981 !important;
+}
+
+.collapse .text-info,
+.collapse .card-body .text-info {
+  color: #3b82f6 !important;
+}
+
+.collapse .text-warning,
+.collapse .card-body .text-warning {
+  color: #f59e0b !important;
+}
+
+.collapse .text-white,
+.collapse .card-body .text-white {
+  color: #f3f4f6 !important;
+}
+
+.collapse .text-gray-300,
+.collapse .card-body .text-gray-300 {
+  color: #d1d5db !important;
+}
+
+.collapse .text-gray-400,
+.collapse .card-body .text-gray-400 {
+  color: #9ca3af !important;
+}
+
+.collapse .text-gray-500,
+.collapse .card-body .text-gray-500 {
+  color: #6b7280 !important;
+}
+
+/* Ensure nested cards maintain dark theme */
+.collapse .bg-gray-900,
+.collapse .card-body .bg-gray-900 {
+  background-color: #111827 !important;
+  color: #f3f4f6 !important;
+}
+
+.collapse .bg-gray-700,
+.collapse .card-body .bg-gray-700 {
+  background-color: #374151 !important;
+  color: #f3f4f6 !important;
+}
+
+/* Force dark theme for pre elements */
+.collapse pre,
+.collapse .card-body pre {
+  background-color: #111827 !important;
+  color: #d1d5db !important;
+  border-color: #374151 !important;
+}
+
+/* Badge colors within collapse */
+.collapse .badge,
+.collapse .card-body .badge {
+  color: #fff !important;
+}
+
+.collapse .badge.bg-success,
+.collapse .card-body .badge.bg-success {
+  background-color: #10b981 !important;
+}
+
+.collapse .badge.bg-danger,
+.collapse .card-body .badge.bg-danger {
+  background-color: #ef4444 !important;
+}
+
+.collapse .badge.bg-warning,
+.collapse .card-body .badge.bg-warning {
+  background-color: #f59e0b !important;
+}
+
+.collapse .badge.bg-info,
+.collapse .card-body .badge.bg-info {
+  background-color: #3b82f6 !important;
+}
+
+.collapse .badge.bg-secondary,
+.collapse .card-body .badge.bg-secondary {
+  background-color: #6b7280 !important;
+}
+
+/* Force dark theme during all Bootstrap transition states */
+.collapse[aria-expanded="true"],
+.collapse[aria-expanded="false"],
+.collapse[aria-hidden="true"],
+.collapse[aria-hidden="false"] {
+  background-color: #1f2937 !important;
+  color: #f3f4f6 !important;
+}
+
+/* Override any potential Bootstrap utility classes */
+.collapse.bg-light,
+.collapse.bg-white,
+.collapse .bg-light,
+.collapse .bg-white {
+  background-color: #1f2937 !important;
+  color: #f3f4f6 !important;
+}
+
 /* AG Grid Theme Overrides */
 .ag-theme-alpine {
   --ag-background-color: #1f2937;
@@ -79,4 +235,24 @@
 .tab-content {
   contain: content;
   will-change: contents;
+}
+
+/* Additional anti-light-mode protection */
+.collapse,
+.collapse * {
+  background-color: #1f2937 !important;
+  color: #f3f4f6 !important;
+}
+
+/* Specifically target the problematic elements */
+.collapse .card-body,
+.collapse .card-body * {
+  background-color: inherit !important;
+  color: inherit !important;
+}
+
+/* Final override for any Bootstrap interference */
+.card .collapse[id^="capaReport"] .card-body {
+  background-color: #1f2937 !important;
+  color: #f3f4f6 !important;
 } 

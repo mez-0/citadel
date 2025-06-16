@@ -26,28 +26,37 @@ const StatusBadgeRenderer = (params: ICellRendererParams) => {
   let badgeClass = '';
   let displayValue = value;
   
-  if (field === 'amsi_result' || field === 'defender_result') {
-    if (value === 'Not Detected' || value === 'CLEAN') {
+  if (field === 'amsi_result') {
+    if (value === 'AMSI_RESULT_NOT_DETECTED') {
       badgeClass = 'badge bg-success';
-      displayValue = 'Clean';
-    } else if (value === 'Detected' || value.includes('THREAT') || value.includes('DETECTED')) {
-      badgeClass = 'badge bg-danger';
-      displayValue = 'Threat';
     } else {
-      badgeClass = 'badge bg-warning text-dark';
-      displayValue = String(value);
+      badgeClass = 'badge bg-danger';
     }
+    displayValue = String(value);
+  } else if (field === 'defender_result') {
+    if (value === 'DEFENDER_RESULT_NOT_DETECTED') {
+      badgeClass = 'badge bg-success';
+    } else {
+      badgeClass = 'badge bg-danger';
+    }
+    displayValue = String(value);
   } else if (field === 'yara_matches') {
     const yaraValue = Array.isArray(value) ? value.length : Number(value);
     if (isNaN(yaraValue)) {
-      badgeClass = 'badge bg-warning text-dark';
-      displayValue = 'Invalid';
-    } else if (yaraValue > 0) {
-      badgeClass = 'badge bg-danger';
-      displayValue = `${yaraValue} Rules`;
+      badgeClass = 'badge bg-secondary';
+      displayValue = '0';
     } else {
-      badgeClass = 'badge bg-success';
-      displayValue = 'Clean';
+      badgeClass = 'badge bg-secondary';
+      displayValue = String(yaraValue);
+    }
+  } else if (field === 'ember_result') {
+    const score = Number(value);
+    if (isNaN(score) || value === null || value === undefined) {
+      badgeClass = 'badge bg-secondary';
+      displayValue = 'N/A';
+    } else {
+      badgeClass = 'badge bg-secondary';
+      displayValue = score.toFixed(4);
     }
   } else if (field === 'task_status') {
     if (value === 'COMPLETED') {
@@ -206,6 +215,22 @@ export function RecentTasksGrid({ tasks }: RecentTasksGridProps) {
       field: 'yara_matches',
       headerName: 'Yara',
       cellRenderer: StatusBadgeRenderer,
+      flex: 0.5,
+      minWidth: 80,
+      sortable: true,
+      filter: 'agNumberColumnFilter',
+    },
+    {
+      field: 'ember_result',
+      headerName: 'Ember Score',
+      cellRenderer: StatusBadgeRenderer,
+      valueGetter: (params) => {
+        const emberResult = params.data?.ember_result;
+        if (emberResult && typeof emberResult === 'object' && emberResult.score !== undefined) {
+          return emberResult.score;
+        }
+        return null;
+      },
       flex: 0.5,
       minWidth: 80,
       sortable: true,

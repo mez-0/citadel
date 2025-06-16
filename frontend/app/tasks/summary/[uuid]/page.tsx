@@ -1,6 +1,7 @@
 'use client';
 import React from "react";
 import Link from "next/link";
+import { useSearchParams, useRouter } from "next/navigation";
 import { ImportLibrariesChart } from "@/components/charts/ImportLibrariesChart";
 import { EntropyAnalysisChart } from "@/components/charts/EntropyAnalysisChart";
 import { AgGridReact } from 'ag-grid-react';
@@ -9,6 +10,7 @@ import { AllCommunityModule } from 'ag-grid-community';
 import '@/app/styles/tabs.css';
 import { FunctionCategoryChart, RawFunctionMapping } from '@/components/charts/FunctionCategoryChart';
 import { SimilarTLSHScatterChart, SimilarTLSHHash } from '@/components/charts/SimilarTLSHScatterChart';
+import { CapaReport, MitreTechnique, MalwareBehaviourCatalog } from '@/lib/types';
 
 // Register AG-Grid modules
 if (typeof window !== 'undefined') {
@@ -143,11 +145,207 @@ const getGridHeight = (rowCount: number, rowHeight = 44, headerHeight = 48, pagi
   return rowHeight * Math.max(rowCount, 1) + headerHeight;
 };
 
+// Helper functions to safely parse CAPA data
+const parseCapaReport = (report: any): CapaReport => {
+  return {
+    name: typeof report.name === 'string' ? report.name : String(report.name || 'Unnamed Capability'),
+    namespace: typeof report.namespace === 'string' ? report.namespace : String(report.namespace || ''),
+    description: typeof report.description === 'string' ? report.description : String(report.description || ''),
+    mitre_techniques: Array.isArray(report.mitre_techniques) ? report.mitre_techniques.map(parseMitreTechnique) : [],
+    malware_behaviour_catalogs: Array.isArray(report.malware_behaviour_catalogs) ? report.malware_behaviour_catalogs.map(parseMalwareBehaviourCatalog) : [],
+    references: Array.isArray(report.references) ? report.references.map((ref: any) => typeof ref === 'string' ? ref : String(ref)) : [],
+    rule: typeof report.rule === 'string' ? report.rule : String(report.rule || '')
+  };
+};
+
+const parseMitreTechnique = (technique: any): MitreTechnique => {
+  return {
+    parts: Array.isArray(technique.parts) ? technique.parts.map((p: any) => String(p)) : [],
+    tactic: typeof technique.tactic === 'string' ? technique.tactic : String(technique.tactic || ''),
+    technique: typeof technique.technique === 'string' ? technique.technique : String(technique.technique || ''),
+    subtechnique: typeof technique.subtechnique === 'string' ? technique.subtechnique : String(technique.subtechnique || ''),
+    tid: typeof technique.tid === 'string' ? technique.tid : String(technique.tid || '')
+  };
+};
+
+const parseMalwareBehaviourCatalog = (mbc: any): MalwareBehaviourCatalog => {
+  return {
+    parts: Array.isArray(mbc.parts) ? mbc.parts.map((p: any) => String(p)) : [],
+    objective: typeof mbc.objective === 'string' ? mbc.objective : String(mbc.objective || ''),
+    behavior: typeof mbc.behavior === 'string' ? mbc.behavior : String(mbc.behavior || ''),
+    method: typeof mbc.method === 'string' ? mbc.method : String(mbc.method || ''),
+    mid: typeof mbc.mid === 'string' ? mbc.mid : String(mbc.mid || '')
+  };
+};
+
+const formatMitreTechnique = (technique: MitreTechnique): string => {
+  const parts = [];
+  if (technique.tid) parts.push(technique.tid);
+  if (technique.technique) parts.push(technique.technique);
+  if (technique.subtechnique) parts.push(technique.subtechnique);
+  return parts.length > 0 ? parts.join(' - ') : 'Unknown Technique';
+};
+
+// Modal Component for CAPA Report Details
+const CapaReportModal = ({ report, reportIndex, uuid }: { report: CapaReport; reportIndex: number; uuid: string }) => {
+  const router = useRouter();
+
+  // Lock body scroll when modal is open
+  React.useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, []);
+
+  const handleClose = (e: React.MouseEvent) => {
+    e.preventDefault();
+    router.push(`/tasks/summary/${uuid}?tab=capa`, { scroll: false });
+  };
+
+  const handleBackdropClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      handleClose(e);
+    }
+  };
+
+  return (
+    <div 
+      className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm overflow-y-auto h-full w-full flex items-center justify-center z-50"
+      onClick={handleBackdropClick}
+    >
+      <div className="relative p-0 border-0 w-full max-w-4xl mx-4 my-8 shadow-2xl rounded-xl bg-gray-800 border-gray-700 max-h-[90vh] overflow-hidden">
+        {/* Modal Header */}
+        <div className="sticky top-0 bg-gray-800 border-b border-gray-700 px-6 py-4 flex justify-between items-start">
+          <div className="flex-1 mr-4">
+            <h3 className="text-xl font-bold text-white mb-2">{report.name}</h3>
+            {report.namespace && (
+              <div className="badge bg-secondary">{report.namespace}</div>
+            )}
+            {report.description && (
+              <p className="text-gray-300 mt-3 mb-0">{report.description}</p>
+            )}
+          </div>
+          <button
+            onClick={handleClose}
+            className="btn btn-sm btn-outline-light flex-shrink-0"
+            type="button"
+          >
+            <i className="bi bi-x-lg"></i>
+          </button>
+        </div>
+
+        {/* Modal Body */}
+        <div className="overflow-y-auto max-h-[calc(90vh-120px)] px-6 py-4">
+          <div className="row g-4">
+            {/* MITRE ATT&CK Techniques */}
+            {report.mitre_techniques.length > 0 && (
+              <div className="col-12">
+                <h6 className="text-danger mb-3">
+                  <i className="bi bi-exclamation-triangle me-2"></i>
+                  MITRE ATT&CK Techniques
+                </h6>
+                <div className="d-flex flex-wrap gap-2">
+                  {report.mitre_techniques.map((technique: MitreTechnique, techIndex: number) => (
+                    <span key={techIndex} className="badge bg-danger px-3 py-2">
+                      {formatMitreTechnique(technique)}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Malware Behavior Catalog */}
+            {report.malware_behaviour_catalogs.length > 0 && (
+              <div className="col-12">
+                <h6 className="text-success mb-3">
+                  <i className="bi bi-bookmark me-2"></i>
+                  Malware Behavior Catalog
+                </h6>
+                <div className="d-flex flex-column gap-2">
+                  {report.malware_behaviour_catalogs.map((mbc: MalwareBehaviourCatalog, mbcIndex: number) => (
+                    <div key={mbcIndex} className="p-3 rounded bg-gray-900 border border-gray-700">
+                      <div className="d-flex justify-content-between align-items-center">
+                        <span className="text-white fw-medium">{mbc.objective}</span>
+                        <span className="badge bg-success">{mbc.mid}</span>
+                      </div>
+                      <div className="text-gray-400 small mt-1">{mbc.behavior}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* References */}
+            {report.references.length > 0 && (
+              <div className="col-12">
+                <h6 className="text-info mb-3">
+                  <i className="bi bi-link-45deg me-2"></i>
+                  References
+                </h6>
+                <div className="bg-gray-900 p-3 rounded border border-gray-700">
+                  <ul className="list-unstyled mb-0">
+                    {report.references.map((ref: string, refIndex: number) => (
+                      <li key={refIndex} className="text-gray-300 mb-2 last:mb-0">
+                        <i className="bi bi-arrow-right me-2 text-gray-500"></i>
+                        {ref.startsWith('http') ? (
+                          <a href={ref} target="_blank" rel="noopener noreferrer" className="text-info text-decoration-none hover:text-info-emphasis">
+                            {ref}
+                          </a>
+                        ) : (
+                          <span className="text-gray-300">{ref}</span>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            )}
+
+            {/* Rule Details */}
+            {report.rule && (
+              <div className="col-12">
+                <h6 className="text-warning mb-3">
+                  <i className="bi bi-code-slash me-2"></i>
+                  Detection Rule
+                </h6>
+                <div className="bg-gray-900 p-3 rounded border border-gray-700">
+                  <pre className="text-gray-300 mb-0 small" style={{ whiteSpace: 'pre-wrap', fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace' }}>
+                    {report.rule}
+                  </pre>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default function TaskSummaryPage({ params }: { params: { uuid: string } }) {
   const [data, setData] = React.useState<PayloadData | null>(null);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
   const [activeTab, setActiveTab] = React.useState("overview");
+  
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const showCapaModal = searchParams.get('capa');
+  const currentTab = searchParams.get('tab');
+
+  // Update active tab based on search params
+  React.useEffect(() => {
+    if (currentTab) {
+      setActiveTab(currentTab);
+    }
+  }, [currentTab]);
+
+  // Handle modal opening with smooth navigation
+  const handleOpenModal = (index: number, e: React.MouseEvent) => {
+    e.preventDefault();
+    router.push(`/tasks/summary/${params.uuid}?tab=capa&capa=${index}`, { scroll: false });
+  };
 
   React.useEffect(() => {
     const fetchData = async () => {
@@ -514,20 +712,6 @@ export default function TaskSummaryPage({ params }: { params: { uuid: string } }
                         </div>
                       </div>
                     )}
-                    {Array.isArray(data.capa_reports) && data.capa_reports.length > 0 && (
-                      <div className="col-md-6">
-                        <div className="p-3 rounded-lg bg-gray-700 h-100">
-                          <h6 className="text-info mb-3">CAPA Analysis</h6>
-                          <ul className="list-unstyled mb-0">
-                            {(data.capa_reports as string[]).map((report: string, idx: number) => (
-                              <li key={idx} className="text-white small mb-2">
-                                {report}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      </div>
-                    )}
                   </div>
                 </div>
               </div>
@@ -630,6 +814,16 @@ export default function TaskSummaryPage({ params }: { params: { uuid: string } }
                       role="tab"
                     >
                       <i className="bi bi-gear me-2"></i>Technical Details
+                    </button>
+                  </li>
+                  <li className="nav-item" role="presentation">
+                    <button
+                      className={`nav-link ${activeTab === "capa" ? "active" : ""}`}
+                      onClick={() => setActiveTab("capa")}
+                      type="button"
+                      role="tab"
+                    >
+                      <i className="bi bi-shield-check me-2"></i>CAPA
                     </button>
                   </li>
                 </ul>
@@ -1030,35 +1224,35 @@ export default function TaskSummaryPage({ params }: { params: { uuid: string } }
                                         field: 'paddr', 
                                         headerName: 'Physical Address', 
                                         flex: 1,
-                                        valueFormatter: (params: { value: number }) =>
+                                        cellRenderer: (params: any) =>
                                           params.value !== undefined ? `0x${params.value.toString(16).toUpperCase()}` : '',
                                       },
                                       { 
                                         field: 'vaddr', 
                                         headerName: 'Virtual Address', 
                                         flex: 1,
-                                        valueFormatter: (params: { value: number }) =>
+                                        cellRenderer: (params: any) =>
                                           params.value !== undefined ? `0x${params.value.toString(16).toUpperCase()}` : '',
                                       },
                                       { 
                                         field: 'baddr', 
                                         headerName: 'Base Address', 
                                         flex: 1,
-                                        valueFormatter: (params: { value: number }) =>
+                                        cellRenderer: (params: any) =>
                                           params.value !== undefined ? `0x${params.value.toString(16).toUpperCase()}` : '',
                                       },
                                       { 
                                         field: 'laddr', 
                                         headerName: 'Load Address', 
                                         flex: 1,
-                                        valueFormatter: (params: { value: number }) =>
+                                        cellRenderer: (params: any) =>
                                           params.value !== undefined ? `0x${params.value.toString(16).toUpperCase()}` : '',
                                       },
                                       { 
                                         field: 'haddr', 
                                         headerName: 'High Address', 
                                         flex: 1,
-                                        valueFormatter: (params: { value: number }) =>
+                                        cellRenderer: (params: any) =>
                                           params.value !== undefined ? `0x${params.value.toString(16).toUpperCase()}` : '',
                                       },
                                       { field: 'type', headerName: 'Type', flex: 1 }
@@ -1086,11 +1280,271 @@ export default function TaskSummaryPage({ params }: { params: { uuid: string } }
                       </div>
                     </div>
                   )}
+
+                  {/* CAPA Tab */}
+                  {activeTab === "capa" && (
+                    <div className="tab-pane show active" id="capa" role="tabpanel">
+                      <div className="row g-4">
+                        {Array.isArray(data.capa_reports) && data.capa_reports.length > 0 ? (
+                          <>
+                            {/* CAPA Overview */}
+                            <div className="col-12">
+                              <div className="card bg-gray-800 border-gray-700">
+                                <div className="card-header bg-gray-800 border-gray-700">
+                                  <div className="d-flex justify-content-between align-items-center">
+                                    <h5 className="card-title text-white mb-0">
+                                      <i className="bi bi-shield-check me-2"></i>
+                                      CAPA Analysis Overview
+                                    </h5>
+                                    <div className="badge bg-info px-3 py-2">
+                                      {data.capa_reports.length} Capabilities Identified
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="card-body">
+                                  <p className="text-gray-300 mb-3">
+                                    CAPA (FLARE team's open-source tool) identifies capabilities in executable files. 
+                                    Each capability represents a behavior or technique that the malware might exhibit.
+                                  </p>
+                                  
+                                  {/* Summary Statistics */}
+                                  <div className="row g-3 mb-4">
+                                    <div className="col-md-3">
+                                      <div className="p-3 rounded-lg bg-gray-700 text-center">
+                                        <div className="text-info fs-3 mb-1">
+                                          <i className="bi bi-list-check"></i>
+                                        </div>
+                                        <h4 className="text-white mb-1">{data.capa_reports.length}</h4>
+                                        <p className="text-gray-400 mb-0 small">Total Capabilities</p>
+                                      </div>
+                                    </div>
+                                    <div className="col-md-3">
+                                      <div className="p-3 rounded-lg bg-gray-700 text-center">
+                                        <div className="text-warning fs-3 mb-1">
+                                          <i className="bi bi-diagram-3"></i>
+                                        </div>
+                                        <h4 className="text-white mb-1">
+                                          {Array.from(new Set((data.capa_reports as any[]).map((report: any) => {
+                                            const namespace = typeof report.namespace === 'string' ? report.namespace : String(report.namespace || '');
+                                            return namespace.split('/')[0];
+                                          }).filter(Boolean))).length}
+                                        </h4>
+                                        <p className="text-gray-400 mb-0 small">Categories</p>
+                                      </div>
+                                    </div>
+                                    <div className="col-md-3">
+                                      <div className="p-3 rounded-lg bg-gray-700 text-center">
+                                        <div className="text-danger fs-3 mb-1">
+                                          <i className="bi bi-exclamation-triangle"></i>
+                                        </div>
+                                        <h4 className="text-white mb-1">
+                                          {(data.capa_reports as any[]).filter((report: any) => 
+                                            Array.isArray(report.mitre_techniques) && report.mitre_techniques.length > 0
+                                          ).length}
+                                        </h4>
+                                        <p className="text-gray-400 mb-0 small">MITRE ATT&CK</p>
+                                      </div>
+                                    </div>
+                                    <div className="col-md-3">
+                                      <div className="p-3 rounded-lg bg-gray-700 text-center">
+                                        <div className="text-success fs-3 mb-1">
+                                          <i className="bi bi-bookmark"></i>
+                                        </div>
+                                        <h4 className="text-white mb-1">
+                                          {(data.capa_reports as any[]).filter((report: any) => 
+                                            Array.isArray(report.malware_behaviour_catalogs) && report.malware_behaviour_catalogs.length > 0
+                                          ).length}
+                                        </h4>
+                                        <p className="text-gray-400 mb-0 small">MBC Behaviors</p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* CAPA Reports */}
+                            <div className="col-12">
+                              <div className="card bg-gray-800 border-gray-700">
+                                <div className="card-header bg-gray-800 border-gray-700">
+                                  <h5 className="card-title text-white mb-0">
+                                    <i className="bi bi-table me-2"></i>
+                                    Detected Capabilities
+                                  </h5>
+                                </div>
+                                <div className="card-body">
+                                  {Array.isArray(data.capa_reports) && data.capa_reports.length > 0 ? (
+                                    <div
+                                      className="ag-theme-alpine"
+                                      style={{
+                                        width: '100%',
+                                        background: '#1f2937',
+                                        color: '#f3f4f6',
+                                        borderRadius: 8,
+                                        border: '1px solid #374151',
+                                        height: getGridHeight(data.capa_reports.length, 60, 48, true)
+                                      }}
+                                    >
+                                      <AgGridReact
+                                        rowData={data.capa_reports.map((rawReport: any, index: number) => {
+                                          const report = parseCapaReport(rawReport);
+                                          return {
+                                            id: index,
+                                            name: report.name,
+                                            namespace: report.namespace || 'N/A',
+                                            description: report.description || 'No description available',
+                                            mitre_count: report.mitre_techniques.length,
+                                            mbc_count: report.malware_behaviour_catalogs.length,
+                                            references_count: report.references.length,
+                                            report: report
+                                          };
+                                        })}
+                                        columnDefs={[
+                                          { 
+                                            field: 'name', 
+                                            headerName: 'Capability Name', 
+                                            flex: 2,
+                                            cellRenderer: (params: any) => (
+                                              <div className="text-white fw-medium">{params.value}</div>
+                                            )
+                                          },
+                                          { 
+                                            field: 'namespace', 
+                                            headerName: 'Namespace', 
+                                            flex: 1,
+                                            cellRenderer: (params: any) => (
+                                              params.value !== 'N/A' 
+                                                ? <span className="badge bg-secondary px-2 py-1">{params.value}</span>
+                                                : <span className="text-gray-400">{params.value}</span>
+                                            )
+                                          },
+                                          { 
+                                            field: 'description', 
+                                            headerName: 'Description', 
+                                            flex: 3,
+                                            cellRenderer: (params: any) => (
+                                              <div 
+                                                className="text-gray-300 small" 
+                                                style={{ 
+                                                  lineHeight: '1.4', 
+                                                  maxHeight: '40px', 
+                                                  overflow: 'hidden', 
+                                                  textOverflow: 'ellipsis' 
+                                                }}
+                                              >
+                                                {params.value}
+                                              </div>
+                                            )
+                                          },
+                                          { 
+                                            field: 'mitre_count', 
+                                            headerName: 'MITRE', 
+                                            width: 80,
+                                            cellRenderer: (params: any) => (
+                                              params.value > 0 
+                                                ? <span className="badge bg-danger px-2 py-1">
+                                                    <i className="bi bi-exclamation-triangle me-1"></i>
+                                                    {params.value}
+                                                  </span>
+                                                : <span className="text-gray-500">0</span>
+                                            )
+                                          },
+                                          { 
+                                            field: 'mbc_count', 
+                                            headerName: 'MBC', 
+                                            width: 80,
+                                            cellRenderer: (params: any) => (
+                                              params.value > 0 
+                                                ? <span className="badge bg-success px-2 py-1">
+                                                    <i className="bi bi-bookmark me-1"></i>
+                                                    {params.value}
+                                                  </span>
+                                                : <span className="text-gray-500">0</span>
+                                            )
+                                          },
+                                          { 
+                                            field: 'references_count', 
+                                            headerName: 'Refs', 
+                                            width: 80,
+                                            cellRenderer: (params: any) => (
+                                              params.value > 0 
+                                                ? <span className="badge bg-info px-2 py-1">
+                                                    <i className="bi bi-link-45deg me-1"></i>
+                                                    {params.value}
+                                                  </span>
+                                                : <span className="text-gray-500">0</span>
+                                            )
+                                          },
+                                          { 
+                                            headerName: 'Actions', 
+                                            width: 120,
+                                            cellRenderer: (params: any) => (
+                                              <button
+                                                className="btn btn-sm btn-primary"
+                                                type="button"
+                                                onClick={() => handleOpenModal(params.data.id, { preventDefault: () => {} } as React.MouseEvent)}
+                                              >
+                                                <i className="bi bi-eye me-1"></i>
+                                                View
+                                              </button>
+                                            ),
+                                            sortable: false,
+                                            filter: false
+                                          }
+                                        ]}
+                                        defaultColDef={{
+                                          sortable: true,
+                                          filter: true,
+                                          resizable: true,
+                                          menuTabs: ['filterMenuTab']
+                                        }}
+                                        animateRows={true}
+                                        headerHeight={48}
+                                        rowHeight={60}
+                                        pagination={data.capa_reports.length > 10}
+                                        paginationPageSize={10}
+                                        domLayout="autoHeight"
+                                      />
+                                    </div>
+                                  ) : (
+                                    <div className="text-gray-400 text-center py-4">No CAPA reports available.</div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </>
+                        ) : (
+                          <div className="col-12">
+                            <div className="card bg-gray-800 border-gray-700">
+                              <div className="card-body text-center py-5">
+                                <div className="text-gray-500 mb-3">
+                                  <i className="bi bi-shield-x fs-1"></i>
+                                </div>
+                                <h5 className="text-white mb-2">No CAPA Reports Available</h5>
+                                <p className="text-gray-400 mb-0">
+                                  No CAPA analysis reports were generated for this file.
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
           </div>
         </div>
+
+        {/* CAPA Report Modal */}
+        {showCapaModal && data && Array.isArray(data.capa_reports) && data.capa_reports.length > 0 && (
+          <CapaReportModal 
+            report={parseCapaReport(data.capa_reports[parseInt(showCapaModal)])} 
+            reportIndex={parseInt(showCapaModal)}
+            uuid={params.uuid}
+          />
+        )}
       </div>
     </div>
   );
