@@ -74,18 +74,37 @@ async def add_file_to_db(
 
 
 def get_files(args: argparse.Namespace) -> list[str]:
+    """
+    Get the files to be analyzed.
+
+    :param args: the arguments from the command line
+    :type args: argparse.Namespace
+    :return: the files to be analyzed
+    :rtype: list[str]
+    """
+
     files = []
 
     if args.file:
         files.append(str(Path(args.file).resolve()))
+
     elif args.directory:
-        for file in Path(args.directory).rglob("*"):
-            if file.is_file():
-                files.append(str(file.resolve()))
+        p = Path(args.directory)
+
+        directories = p.glob("**/*")
+
+        for directory in directories:
+            if directory.is_file():
+                files.append(str(directory.resolve()))
+
     return files
 
 
 async def main():
+    """
+    gogogo!
+    """
+
     args = get_args()
 
     if args.file and args.directory:
@@ -97,6 +116,8 @@ async def main():
     if not files:
         logger.bad("No files found.")
         return
+
+    logger.info(f"Found {len(files)} files to analyze")
 
     api = CitadelDatabaseApi()
 
