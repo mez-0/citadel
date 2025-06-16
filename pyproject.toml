@@ -1,3 +1,33 @@
-[build-system]
-requires = ["setuptools>=42", "wheel", "setuptools_scm>=3.4"]
-build-backend = "setuptools.build_meta"
+[project]
+name = "citadel"
+version = "2.0.0"
+description = "A Payload Analysis Framework"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "asn1crypto>=1.5.1",
+    "chartkick>=1.1.0",
+    "cryptography>=45.0.4",
+    "dataclasses-json>=0.6.7",
+    "die-python>=0.4.0",
+    "huggingface-hub>=0.33.0",
+    "lief>=0.16.6",
+    "lightgbm>=4.6.0",
+    "motor>=3.7.1",
+    "pefile>=2024.8.26",
+    "pymongo>=4.13.1",
+    "python-magic>=0.4.27",
+    "python-tlsh>=4.5.0",
+    "quart>=0.20.0",
+    "r2pipe>=1.9.4",
+    "requests>=2.32.4",
+    "rich>=14.0.0",
+    "rich-argparse>=1.7.1",
+    "yara-python>=4.5.4",
+]
+
+[tool.setuptools]
+packages = ["citadel"]
+
+[tool.setuptools.package-data]
+citadel = ["*"]
