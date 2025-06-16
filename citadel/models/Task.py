@@ -7,6 +7,7 @@ from dataclasses_json import dataclass_json
 
 from citadel.models.Bytes import Bytes
 from citadel.models.Capa import CapaReport
+from citadel.models.EmberResult import EmberResult
 from citadel.models.FunctionMapping import FunctionMapping
 from citadel.models.Yara import Yara
 
@@ -102,6 +103,9 @@ class Task:
 
     """the yara matches"""
     yara_matches: list[Yara] = field(default_factory=list[Yara])
+
+    """the ember result"""
+    ember_result: EmberResult = field(default_factory=EmberResult)
 
     def __post_init__(self):
         if self.time_sent:
