@@ -10,7 +10,7 @@ import { AllCommunityModule } from 'ag-grid-community';
 import '@/app/styles/tabs.css';
 import { FunctionCategoryChart, RawFunctionMapping } from '@/components/charts/FunctionCategoryChart';
 import { SimilarTLSHScatterChart, SimilarTLSHHash } from '@/components/charts/SimilarTLSHScatterChart';
-import { CapaReport, MitreTechnique, MalwareBehaviourCatalog, EmberResult } from '@/lib/types';
+import { CapaReport, MitreTechnique, MalwareBehaviourCatalog, EmberResult, MaliciousBytes } from '@/lib/types';
 
 // Register AG-Grid modules
 if (typeof window !== 'undefined') {
@@ -89,8 +89,8 @@ interface PayloadData {
   amsi_result?: string;
   defender_result?: string;
   threat_names?: unknown[];
-  zero_x_malicious_bytes?: unknown;
-  x_y_malicious_bytes?: unknown;
+  zero_x_malicious_bytes?: MaliciousBytes;
+  x_y_malicious_bytes?: MaliciousBytes;
   thorough_malicious_bytes?: unknown[];
   function_mappings?: unknown[];
   capa_reports?: unknown[];
@@ -1049,6 +1049,7 @@ export default function TaskSummaryPage({ params }: { params: { uuid: string } }
                             </div>
                           </div>
                         )}
+
                         {/* Similar TLSH Hashes Scatter Chart */}
                         {Array.isArray(data.similar_tlsh_hashes) && data.similar_tlsh_hashes.length > 0 && (
                           <div className="col-12">
@@ -1064,6 +1065,196 @@ export default function TaskSummaryPage({ params }: { params: { uuid: string } }
                                   This scatter diagram visualizes the distance between the current file&apos;s TLSH hash and similar samples. Lower distances indicate higher similarity. Raw data is shown below the chart.
                                 </p>
                                 <SimilarTLSHScatterChart data={data.similar_tlsh_hashes as SimilarTLSHHash[]} />
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Malicious Bytes Analysis */}
+                        {(data.zero_x_malicious_bytes || data.x_y_malicious_bytes) && (
+                          <div className="col-12">
+                            <div className="card bg-gray-800 border-gray-700">
+                              <div className="card-header bg-gray-800 border-gray-700">
+                                <h5 className="card-title text-white mb-0 d-flex align-items-center">
+                                  <i className="bi bi-exclamation-diamond me-2"></i>
+                                  Malicious Bytes Analysis
+                                </h5>
+                              </div>
+                              <div className="card-body">
+                                <p className="text-gray-400 mb-4">
+                                  This section displays detected malicious byte patterns and their characteristics. 
+                                  These patterns have been identified as potentially harmful or suspicious.
+                                </p>
+                                
+                                <div className="row g-4">
+                                  {/* Zero-X Malicious Bytes */}
+                                  {data.zero_x_malicious_bytes && (
+                                    <div className="col-12">
+                                      <div className="card bg-gray-700 border-gray-600">
+                                        <div className="card-header bg-gray-700 border-gray-600">
+                                          <div className="d-flex justify-content-between align-items-center">
+                                            <h6 className="text-white mb-0 d-flex align-items-center">
+                                              <i className="bi bi-file-binary me-2 text-danger"></i>
+                                              Zero-X Malicious Bytes
+                                            </h6>
+                                            <div className="d-flex align-items-center gap-3">
+                                              <div className="badge bg-warning px-3 py-2">
+                                                Entropy: {data.zero_x_malicious_bytes.entropy.toFixed(6)}
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                        <div className="card-body">
+                                          <div className="row g-4">
+                                            {/* ASCII Hex Representation */}
+                                            <div className="col-12">
+                                              <h6 className="text-gray-400 mb-3 d-flex align-items-center">
+                                                <i className="bi bi-filetype-txt me-2"></i>
+                                                ASCII Hex Representation
+                                              </h6>
+                                              <div className="bg-gray-900 p-4 rounded-lg border border-gray-600 position-relative">
+                                                <div className="d-flex justify-content-between align-items-center mb-2">
+                                                  <span className="text-gray-400 small">Hexadecimal View with ASCII</span>
+                                                  <button 
+                                                    className="btn btn-sm btn-outline-secondary"
+                                                    onClick={() => navigator.clipboard.writeText(data.zero_x_malicious_bytes!.ascii_byte_representation)}
+                                                  >
+                                                    <i className="bi bi-clipboard me-1"></i>
+                                                    Copy
+                                                  </button>
+                                                </div>
+                                                <pre 
+                                                  className="text-gray-300 mb-0 small overflow-auto" 
+                                                  style={{ 
+                                                    maxHeight: '300px',
+                                                    fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+                                                    lineHeight: '1.4'
+                                                  }}
+                                                >
+                                                  {data.zero_x_malicious_bytes.ascii_byte_representation}
+                                                </pre>
+                                              </div>
+                                            </div>
+
+                                            {/* Entropy Analysis */}
+                                            <div className="col-12">
+                                              <div className="p-3 rounded-lg bg-gray-900 border border-gray-600">
+                                                <h6 className="text-gray-400 mb-3">Byte Pattern Analysis</h6>
+                                                <div className="row g-3">
+                                                  <div className="col-md-6">
+                                                    <div className="text-center">
+                                                      <div className={`fs-2 mb-2 ${data.zero_x_malicious_bytes.entropy > 7 ? 'text-danger' : data.zero_x_malicious_bytes.entropy > 6 ? 'text-warning' : 'text-success'}`}>
+                                                        {data.zero_x_malicious_bytes.entropy.toFixed(3)}
+                                                      </div>
+                                                      <div className="text-white fw-medium mb-1">Entropy Score</div>
+                                                      <div className="text-gray-400 small">
+                                                        {data.zero_x_malicious_bytes.entropy > 7 ? 'High Randomness' : 
+                                                         data.zero_x_malicious_bytes.entropy > 6 ? 'Medium Randomness' : 'Low Randomness'}
+                                                      </div>
+                                                    </div>
+                                                  </div>
+                                                  <div className="col-md-6">
+                                                    <div className="text-center">
+                                                      <div className="text-warning fs-2 mb-2">
+                                                        <i className="bi bi-exclamation-triangle"></i>
+                                                      </div>
+                                                      <div className="text-white fw-medium mb-1">Risk Level</div>
+                                                      <div className="text-gray-400 small">Malicious Pattern</div>
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  {/* X-Y Malicious Bytes */}
+                                  {data.x_y_malicious_bytes && (
+                                    <div className="col-12">
+                                      <div className="card bg-gray-700 border-gray-600">
+                                        <div className="card-header bg-gray-700 border-gray-600">
+                                          <div className="d-flex justify-content-between align-items-center">
+                                            <h6 className="text-white mb-0 d-flex align-items-center">
+                                              <i className="bi bi-file-binary me-2 text-danger"></i>
+                                              X-Y Malicious Bytes
+                                            </h6>
+                                            <div className="d-flex align-items-center gap-3">
+                                              <div className="badge bg-warning px-3 py-2">
+                                                Entropy: {data.x_y_malicious_bytes.entropy.toFixed(6)}
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                        <div className="card-body">
+                                          <div className="row g-4">
+                                            {/* ASCII Hex Representation */}
+                                            <div className="col-12">
+                                              <h6 className="text-gray-400 mb-3 d-flex align-items-center">
+                                                <i className="bi bi-filetype-txt me-2"></i>
+                                                ASCII Hex Representation
+                                              </h6>
+                                              <div className="bg-gray-900 p-4 rounded-lg border border-gray-600 position-relative">
+                                                <div className="d-flex justify-content-between align-items-center mb-2">
+                                                  <span className="text-gray-400 small">Hexadecimal View with ASCII</span>
+                                                  <button 
+                                                    className="btn btn-sm btn-outline-secondary"
+                                                    onClick={() => navigator.clipboard.writeText(data.x_y_malicious_bytes!.ascii_byte_representation)}
+                                                  >
+                                                    <i className="bi bi-clipboard me-1"></i>
+                                                    Copy
+                                                  </button>
+                                                </div>
+                                                <pre 
+                                                  className="text-gray-300 mb-0 small overflow-auto" 
+                                                  style={{ 
+                                                    maxHeight: '300px',
+                                                    fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+                                                    lineHeight: '1.4'
+                                                  }}
+                                                >
+                                                  {data.x_y_malicious_bytes.ascii_byte_representation}
+                                                </pre>
+                                              </div>
+                                            </div>
+
+                                            {/* Entropy Analysis */}
+                                            <div className="col-12">
+                                              <div className="p-3 rounded-lg bg-gray-900 border border-gray-600">
+                                                <h6 className="text-gray-400 mb-3">Byte Pattern Analysis</h6>
+                                                <div className="row g-3">
+                                                  <div className="col-md-6">
+                                                    <div className="text-center">
+                                                      <div className={`fs-2 mb-2 ${data.x_y_malicious_bytes.entropy > 7 ? 'text-danger' : data.x_y_malicious_bytes.entropy > 6 ? 'text-warning' : 'text-success'}`}>
+                                                        {data.x_y_malicious_bytes.entropy.toFixed(3)}
+                                                      </div>
+                                                      <div className="text-white fw-medium mb-1">Entropy Score</div>
+                                                      <div className="text-gray-400 small">
+                                                        {data.x_y_malicious_bytes.entropy > 7 ? 'High Randomness' : 
+                                                         data.x_y_malicious_bytes.entropy > 6 ? 'Medium Randomness' : 'Low Randomness'}
+                                                      </div>
+                                                    </div>
+                                                  </div>
+                                                  <div className="col-md-6">
+                                                    <div className="text-center">
+                                                      <div className="text-warning fs-2 mb-2">
+                                                        <i className="bi bi-exclamation-triangle"></i>
+                                                      </div>
+                                                      <div className="text-white fw-medium mb-1">Risk Level</div>
+                                                      <div className="text-gray-400 small">Malicious Pattern</div>
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
                               </div>
                             </div>
                           </div>
@@ -1268,36 +1459,41 @@ export default function TaskSummaryPage({ params }: { params: { uuid: string } }
                                         field: 'paddr', 
                                         headerName: 'Physical Address', 
                                         flex: 1,
-                                        valueFormatter: (params: any) => 
-                                          params.value !== undefined ? `0x${params.value.toString(16).toUpperCase()}` : '',
+                                        valueFormatter: (params: any) => {
+                                          return params.value !== undefined && params.value !== null ? `0x${params.value.toString(16).toUpperCase()}` : 'N/A';
+                                        }
                                       },
                                       { 
                                         field: 'vaddr', 
                                         headerName: 'Virtual Address', 
                                         flex: 1,
-                                        valueFormatter: (params: any) => 
-                                          params.value !== undefined ? `0x${params.value.toString(16).toUpperCase()}` : '',
+                                        valueFormatter: (params: any) => {
+                                          return params.value !== undefined && params.value !== null ? `0x${params.value.toString(16).toUpperCase()}` : 'N/A';
+                                        }
                                       },
                                       { 
                                         field: 'baddr', 
                                         headerName: 'Base Address', 
                                         flex: 1,
-                                        valueFormatter: (params: any) => 
-                                          params.value !== undefined ? `0x${params.value.toString(16).toUpperCase()}` : '',
+                                        valueFormatter: (params: any) => {
+                                          return params.value !== undefined && params.value !== null ? `0x${params.value.toString(16).toUpperCase()}` : 'N/A';
+                                        }
                                       },
                                       { 
                                         field: 'laddr', 
                                         headerName: 'Load Address', 
                                         flex: 1,
-                                        valueFormatter: (params: any) => 
-                                          params.value !== undefined ? `0x${params.value.toString(16).toUpperCase()}` : '',
+                                        valueFormatter: (params: any) => {
+                                          return params.value !== undefined && params.value !== null ? `0x${params.value.toString(16).toUpperCase()}` : 'N/A';
+                                        }
                                       },
                                       { 
                                         field: 'haddr', 
                                         headerName: 'High Address', 
                                         flex: 1,
-                                        valueFormatter: (params: any) => 
-                                          params.value !== undefined ? `0x${params.value.toString(16).toUpperCase()}` : '',
+                                        valueFormatter: (params: any) => {
+                                          return params.value !== undefined && params.value !== null ? `0x${params.value.toString(16).toUpperCase()}` : 'N/A';
+                                        }
                                       },
                                       { field: 'type', headerName: 'Type', flex: 1 }
                                     ]}

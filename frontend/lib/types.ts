@@ -16,16 +16,8 @@ export interface Task {
   amsi_result: string;
   defender_result: string;
   threat_names: string[];
-  zero_x_malicious_bytes?: {
-    base64_bytes: string;
-    ascii_byte_representation: string;
-    entropy: number;
-  };
-  x_y_malicious_bytes?: {
-    base64_bytes: string;
-    ascii_byte_representation: string;
-    entropy: number;
-  };
+  zero_x_malicious_bytes?: MaliciousBytes;
+  x_y_malicious_bytes?: MaliciousBytes;
   thorough_malicious_bytes: unknown[];
   function_mappings: FunctionMapping[];
   capa_reports: CapaReport[];
@@ -99,4 +91,11 @@ export interface DashboardStats {
   failedTasks: number;
   threatsDetected: number;
   cleanFiles: number;
+}
+
+// Add new interface for malicious bytes data
+export interface MaliciousBytes {
+  base64_bytes: string;
+  ascii_byte_representation: string;
+  entropy: number;
 } 
