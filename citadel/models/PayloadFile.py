@@ -174,7 +174,6 @@ class PayloadFile:
     packers: list[DetectItEasy] = field(default_factory=list)
     sign_tools: list[DetectItEasy] = field(default_factory=list)
     tools: list[DetectItEasy] = field(default_factory=list)
-    etw_events: list[dict] = field(default_factory=list)
 
     def __post_init__(self):
         if self.certificates:

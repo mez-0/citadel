@@ -63,6 +63,9 @@ class Task:
     """name of the file"""
     file_name: str = field(default_factory=str)
 
+    """llm summary of the task"""
+    llm_summary: str = field(default_factory=str)
+
     """whether to enable static analysis"""
     enable_static_analysis: bool = field(default=True)
 

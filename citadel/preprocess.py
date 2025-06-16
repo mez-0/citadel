@@ -4,6 +4,7 @@ from citadel import logger
 from citadel.capa_handler import get_capa_reports
 from citadel.ember import analyse_file_with_ember
 from citadel.import_catergories import get_function_mapping
+from citadel.llm import summarise_task_with_openai
 from citadel.lookup_tlsh import find_similar_hashes
 from citadel.models.PayloadFile import PayloadFile
 from citadel.models.Task import Task
@@ -71,5 +72,7 @@ async def pre_process(
             logger.good(
                 f"Found {len(task.similar_tlsh_hashes)} similar TLSH hashes", indent=1
             )
+
+    task.llm_summary = summarise_task_with_openai(task, payload)
 
     return task
