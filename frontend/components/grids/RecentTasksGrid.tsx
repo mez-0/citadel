@@ -146,23 +146,6 @@ const DateRenderer = (params: ICellRendererParams) => {
 export function RecentTasksGrid({ tasks }: RecentTasksGridProps) {
   const columnDefs: ColDef[] = [
     {
-      field: 'uuid',
-      headerName: 'UUID',
-      flex: 1,
-      minWidth: 200,
-      sortable: true,
-      filter: true,
-      filterParams: {
-        filterOptions: ['contains'],
-        suppressAndOrCondition: true,
-      },
-      cellStyle: { 
-        fontFamily: 'monospace',
-        fontSize: '0.8rem',
-        color: '#93c5fd'
-      },
-    },
-    {
       field: 'file_name',
       headerName: 'File Name',
       cellRenderer: FileLinkRenderer,
