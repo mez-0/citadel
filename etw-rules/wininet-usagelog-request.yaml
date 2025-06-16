@@ -1,9 +1,0 @@
-rule:
-  name: "WinINet Usage Log Request"
-  provider: "Microsoft-Windows-WinINet"
-  task: "Wininet_UsageLogRequest"
-  opcode: "Info"
-  fields:
-    - URL
-    - Verb
-    - RequestHeaders
