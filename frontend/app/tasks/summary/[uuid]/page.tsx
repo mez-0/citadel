@@ -503,6 +503,498 @@ export default function TaskSummaryPageRefactored({ params }: { params: { uuid: 
                             </div>
                           </div>
                         </div>
+
+                        {/* Compilers Table */}
+                        {Array.isArray(data.compilers) && data.compilers.length > 0 && (
+                          <div className="col-12">
+                            <div className="card bg-gray-800 border-gray-700">
+                              <div className="card-header bg-gray-800 border-gray-700">
+                                <h5 className="card-title text-white mb-0">
+                                  <i className="bi bi-code-slash me-2"></i>
+                                  Compilers
+                                  <span className="badge bg-primary ms-2">{data.compilers.length}</span>
+                                </h5>
+                              </div>
+                              <div className="card-body">
+                                <div
+                                  className="ag-theme-alpine"
+                                  style={{
+                                    width: '100%',
+                                    background: '#1f2937',
+                                    color: '#f3f4f6',
+                                    borderRadius: 8,
+                                    border: '1px solid #374151',
+                                    height: getGridHeight(data.compilers.length, 44, 48, true)
+                                  }}
+                                >
+                                  <AgGridReact
+                                    rowData={data.compilers.map((compiler: any, index: number) => ({
+                                      id: index,
+                                      name: compiler.name || 'N/A',
+                                      version: compiler.version || 'N/A',
+                                      info: compiler.info || 'N/A',
+                                      type: compiler.type || 'N/A'
+                                    }))}
+                                    columnDefs={[
+                                      { 
+                                        field: 'name', 
+                                        headerName: 'Name', 
+                                        flex: 2,
+                                        cellClass: 'text-white fw-medium'
+                                      },
+                                      { 
+                                        field: 'version', 
+                                        headerName: 'Version', 
+                                        flex: 1,
+                                        cellRenderer: (params: any) => (
+                                          params.value !== 'N/A' 
+                                            ? <span className="badge bg-info px-2 py-1">{params.value}</span>
+                                            : <span className="text-gray-400">{params.value}</span>
+                                        )
+                                      },
+                                      { 
+                                        field: 'info', 
+                                        headerName: 'Info', 
+                                        flex: 2,
+                                        cellClass: 'text-gray-300'
+                                      },
+                                      { 
+                                        field: 'type', 
+                                        headerName: 'Type', 
+                                        flex: 1,
+                                        cellRenderer: (params: any) => (
+                                          <span className="badge bg-secondary px-2 py-1">{params.value}</span>
+                                        )
+                                      }
+                                    ]}
+                                    defaultColDef={{
+                                      sortable: true,
+                                      filter: true,
+                                      resizable: true,
+                                      menuTabs: ['filterMenuTab']
+                                    }}
+                                    animateRows={true}
+                                    headerHeight={48}
+                                    rowHeight={44}
+                                    pagination={data.compilers.length > 10}
+                                    paginationPageSize={10}
+                                    domLayout="autoHeight"
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Libraries Table */}
+                        {Array.isArray(data.libraries) && data.libraries.length > 0 && (
+                          <div className="col-12">
+                            <div className="card bg-gray-800 border-gray-700">
+                              <div className="card-header bg-gray-800 border-gray-700">
+                                <h5 className="card-title text-white mb-0">
+                                  <i className="bi bi-collection me-2"></i>
+                                  Libraries
+                                  <span className="badge bg-success ms-2">{data.libraries.length}</span>
+                                </h5>
+                              </div>
+                              <div className="card-body">
+                                <div
+                                  className="ag-theme-alpine"
+                                  style={{
+                                    width: '100%',
+                                    background: '#1f2937',
+                                    color: '#f3f4f6',
+                                    borderRadius: 8,
+                                    border: '1px solid #374151',
+                                    height: getGridHeight(data.libraries.length, 44, 48, true)
+                                  }}
+                                >
+                                  <AgGridReact
+                                    rowData={data.libraries.map((library: any, index: number) => ({
+                                      id: index,
+                                      name: library.name || 'N/A',
+                                      version: library.version || 'N/A',
+                                      info: library.info || 'N/A',
+                                      type: library.type || 'N/A'
+                                    }))}
+                                    columnDefs={[
+                                      { 
+                                        field: 'name', 
+                                        headerName: 'Name', 
+                                        flex: 2,
+                                        cellClass: 'text-white fw-medium'
+                                      },
+                                      { 
+                                        field: 'version', 
+                                        headerName: 'Version', 
+                                        flex: 1,
+                                        cellRenderer: (params: any) => (
+                                          params.value !== 'N/A' 
+                                            ? <span className="badge bg-info px-2 py-1">{params.value}</span>
+                                            : <span className="text-gray-400">{params.value}</span>
+                                        )
+                                      },
+                                      { 
+                                        field: 'info', 
+                                        headerName: 'Info', 
+                                        flex: 2,
+                                        cellClass: 'text-gray-300'
+                                      },
+                                      { 
+                                        field: 'type', 
+                                        headerName: 'Type', 
+                                        flex: 1,
+                                        cellRenderer: (params: any) => (
+                                          <span className="badge bg-secondary px-2 py-1">{params.value}</span>
+                                        )
+                                      }
+                                    ]}
+                                    defaultColDef={{
+                                      sortable: true,
+                                      filter: true,
+                                      resizable: true,
+                                      menuTabs: ['filterMenuTab']
+                                    }}
+                                    animateRows={true}
+                                    headerHeight={48}
+                                    rowHeight={44}
+                                    pagination={data.libraries.length > 10}
+                                    paginationPageSize={10}
+                                    domLayout="autoHeight"
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Linkers Table */}
+                        {Array.isArray(data.linkers) && data.linkers.length > 0 && (
+                          <div className="col-12">
+                            <div className="card bg-gray-800 border-gray-700">
+                              <div className="card-header bg-gray-800 border-gray-700">
+                                <h5 className="card-title text-white mb-0">
+                                  <i className="bi bi-link-45deg me-2"></i>
+                                  Linkers
+                                  <span className="badge bg-warning ms-2">{data.linkers.length}</span>
+                                </h5>
+                              </div>
+                              <div className="card-body">
+                                <div
+                                  className="ag-theme-alpine"
+                                  style={{
+                                    width: '100%',
+                                    background: '#1f2937',
+                                    color: '#f3f4f6',
+                                    borderRadius: 8,
+                                    border: '1px solid #374151',
+                                    height: getGridHeight(data.linkers.length, 44, 48, true)
+                                  }}
+                                >
+                                  <AgGridReact
+                                    rowData={data.linkers.map((linker: any, index: number) => ({
+                                      id: index,
+                                      name: linker.name || 'N/A',
+                                      version: linker.version || 'N/A',
+                                      info: linker.info || 'N/A',
+                                      type: linker.type || 'N/A'
+                                    }))}
+                                    columnDefs={[
+                                      { 
+                                        field: 'name', 
+                                        headerName: 'Name', 
+                                        flex: 2,
+                                        cellClass: 'text-white fw-medium'
+                                      },
+                                      { 
+                                        field: 'version', 
+                                        headerName: 'Version', 
+                                        flex: 1,
+                                        cellRenderer: (params: any) => (
+                                          params.value !== 'N/A' 
+                                            ? <span className="badge bg-info px-2 py-1">{params.value}</span>
+                                            : <span className="text-gray-400">{params.value}</span>
+                                        )
+                                      },
+                                      { 
+                                        field: 'info', 
+                                        headerName: 'Info', 
+                                        flex: 2,
+                                        cellClass: 'text-gray-300'
+                                      },
+                                      { 
+                                        field: 'type', 
+                                        headerName: 'Type', 
+                                        flex: 1,
+                                        cellRenderer: (params: any) => (
+                                          <span className="badge bg-secondary px-2 py-1">{params.value}</span>
+                                        )
+                                      }
+                                    ]}
+                                    defaultColDef={{
+                                      sortable: true,
+                                      filter: true,
+                                      resizable: true,
+                                      menuTabs: ['filterMenuTab']
+                                    }}
+                                    animateRows={true}
+                                    headerHeight={48}
+                                    rowHeight={44}
+                                    pagination={data.linkers.length > 10}
+                                    paginationPageSize={10}
+                                    domLayout="autoHeight"
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Packers Table */}
+                        {Array.isArray(data.packers) && data.packers.length > 0 && (
+                          <div className="col-12">
+                            <div className="card bg-gray-800 border-gray-700">
+                              <div className="card-header bg-gray-800 border-gray-700">
+                                <h5 className="card-title text-white mb-0">
+                                  <i className="bi bi-archive me-2"></i>
+                                  Packers
+                                  <span className="badge bg-danger ms-2">{data.packers.length}</span>
+                                </h5>
+                              </div>
+                              <div className="card-body">
+                                <div
+                                  className="ag-theme-alpine"
+                                  style={{
+                                    width: '100%',
+                                    background: '#1f2937',
+                                    color: '#f3f4f6',
+                                    borderRadius: 8,
+                                    border: '1px solid #374151',
+                                    height: getGridHeight(data.packers.length, 44, 48, true)
+                                  }}
+                                >
+                                  <AgGridReact
+                                    rowData={data.packers.map((packer: any, index: number) => ({
+                                      id: index,
+                                      name: packer.name || 'N/A',
+                                      version: packer.version || 'N/A',
+                                      info: packer.info || 'N/A',
+                                      type: packer.type || 'N/A'
+                                    }))}
+                                    columnDefs={[
+                                      { 
+                                        field: 'name', 
+                                        headerName: 'Name', 
+                                        flex: 2,
+                                        cellClass: 'text-white fw-medium'
+                                      },
+                                      { 
+                                        field: 'version', 
+                                        headerName: 'Version', 
+                                        flex: 1,
+                                        cellRenderer: (params: any) => (
+                                          params.value !== 'N/A' 
+                                            ? <span className="badge bg-info px-2 py-1">{params.value}</span>
+                                            : <span className="text-gray-400">{params.value}</span>
+                                        )
+                                      },
+                                      { 
+                                        field: 'info', 
+                                        headerName: 'Info', 
+                                        flex: 2,
+                                        cellClass: 'text-gray-300'
+                                      },
+                                      { 
+                                        field: 'type', 
+                                        headerName: 'Type', 
+                                        flex: 1,
+                                        cellRenderer: (params: any) => (
+                                          <span className="badge bg-secondary px-2 py-1">{params.value}</span>
+                                        )
+                                      }
+                                    ]}
+                                    defaultColDef={{
+                                      sortable: true,
+                                      filter: true,
+                                      resizable: true,
+                                      menuTabs: ['filterMenuTab']
+                                    }}
+                                    animateRows={true}
+                                    headerHeight={48}
+                                    rowHeight={44}
+                                    pagination={data.packers.length > 10}
+                                    paginationPageSize={10}
+                                    domLayout="autoHeight"
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Sign Tools Table */}
+                        {Array.isArray(data.sign_tools) && data.sign_tools.length > 0 && (
+                          <div className="col-12">
+                            <div className="card bg-gray-800 border-gray-700">
+                              <div className="card-header bg-gray-800 border-gray-700">
+                                <h5 className="card-title text-white mb-0">
+                                  <i className="bi bi-shield-check me-2"></i>
+                                  Signing Tools
+                                  <span className="badge bg-info ms-2">{data.sign_tools.length}</span>
+                                </h5>
+                              </div>
+                              <div className="card-body">
+                                <div
+                                  className="ag-theme-alpine"
+                                  style={{
+                                    width: '100%',
+                                    background: '#1f2937',
+                                    color: '#f3f4f6',
+                                    borderRadius: 8,
+                                    border: '1px solid #374151',
+                                    height: getGridHeight(data.sign_tools.length, 44, 48, true)
+                                  }}
+                                >
+                                  <AgGridReact
+                                    rowData={data.sign_tools.map((signTool: any, index: number) => ({
+                                      id: index,
+                                      name: signTool.name || 'N/A',
+                                      version: signTool.version || 'N/A',
+                                      info: signTool.info || 'N/A',
+                                      type: signTool.type || 'N/A'
+                                    }))}
+                                    columnDefs={[
+                                      { 
+                                        field: 'name', 
+                                        headerName: 'Name', 
+                                        flex: 2,
+                                        cellClass: 'text-white fw-medium'
+                                      },
+                                      { 
+                                        field: 'version', 
+                                        headerName: 'Version', 
+                                        flex: 1,
+                                        cellRenderer: (params: any) => (
+                                          params.value !== 'N/A' 
+                                            ? <span className="badge bg-info px-2 py-1">{params.value}</span>
+                                            : <span className="text-gray-400">{params.value}</span>
+                                        )
+                                      },
+                                      { 
+                                        field: 'info', 
+                                        headerName: 'Info', 
+                                        flex: 2,
+                                        cellClass: 'text-gray-300'
+                                      },
+                                      { 
+                                        field: 'type', 
+                                        headerName: 'Type', 
+                                        flex: 1,
+                                        cellRenderer: (params: any) => (
+                                          <span className="badge bg-secondary px-2 py-1">{params.value}</span>
+                                        )
+                                      }
+                                    ]}
+                                    defaultColDef={{
+                                      sortable: true,
+                                      filter: true,
+                                      resizable: true,
+                                      menuTabs: ['filterMenuTab']
+                                    }}
+                                    animateRows={true}
+                                    headerHeight={48}
+                                    rowHeight={44}
+                                    pagination={data.sign_tools.length > 10}
+                                    paginationPageSize={10}
+                                    domLayout="autoHeight"
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Tools Table */}
+                        {Array.isArray(data.tools) && data.tools.length > 0 && (
+                          <div className="col-12">
+                            <div className="card bg-gray-800 border-gray-700">
+                              <div className="card-header bg-gray-800 border-gray-700">
+                                <h5 className="card-title text-white mb-0">
+                                  <i className="bi bi-tools me-2"></i>
+                                  Tools
+                                  <span className="badge bg-secondary ms-2">{data.tools.length}</span>
+                                </h5>
+                              </div>
+                              <div className="card-body">
+                                <div
+                                  className="ag-theme-alpine"
+                                  style={{
+                                    width: '100%',
+                                    background: '#1f2937',
+                                    color: '#f3f4f6',
+                                    borderRadius: 8,
+                                    border: '1px solid #374151',
+                                    height: getGridHeight(data.tools.length, 44, 48, true)
+                                  }}
+                                >
+                                  <AgGridReact
+                                    rowData={data.tools.map((tool: any, index: number) => ({
+                                      id: index,
+                                      name: tool.name || 'N/A',
+                                      version: tool.version || 'N/A',
+                                      info: tool.info || 'N/A',
+                                      type: tool.type || 'N/A'
+                                    }))}
+                                    columnDefs={[
+                                      { 
+                                        field: 'name', 
+                                        headerName: 'Name', 
+                                        flex: 2,
+                                        cellClass: 'text-white fw-medium'
+                                      },
+                                      { 
+                                        field: 'version', 
+                                        headerName: 'Version', 
+                                        flex: 1,
+                                        cellRenderer: (params: any) => (
+                                          params.value !== 'N/A' 
+                                            ? <span className="badge bg-info px-2 py-1">{params.value}</span>
+                                            : <span className="text-gray-400">{params.value}</span>
+                                        )
+                                      },
+                                      { 
+                                        field: 'info', 
+                                        headerName: 'Info', 
+                                        flex: 2,
+                                        cellClass: 'text-gray-300'
+                                      },
+                                      { 
+                                        field: 'type', 
+                                        headerName: 'Type', 
+                                        flex: 1,
+                                        cellRenderer: (params: any) => (
+                                          <span className="badge bg-secondary px-2 py-1">{params.value}</span>
+                                        )
+                                      }
+                                    ]}
+                                    defaultColDef={{
+                                      sortable: true,
+                                      filter: true,
+                                      resizable: true,
+                                      menuTabs: ['filterMenuTab']
+                                    }}
+                                    animateRows={true}
+                                    headerHeight={48}
+                                    rowHeight={44}
+                                    pagination={data.tools.length > 10}
+                                    paginationPageSize={10}
+                                    domLayout="autoHeight"
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}

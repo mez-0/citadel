@@ -39,6 +39,13 @@ export const SecurityStatusOverview: React.FC<SecurityStatusOverviewProps> = ({
   const defenderClean = getDefenderResult();
   const emberStatus = getEmberStatus();
 
+  // Get threat names from data
+  const threatNames = (data.threat_names || []) as string[];
+  const validThreatNames = threatNames.filter((name): name is string => 
+    typeof name === 'string' && name.trim() !== ''
+  );
+  const hasThreats = validThreatNames.length > 0;
+
   return (
     <div className={`row g-4 mb-4 ${className}`}>
       <div className="col-12">
@@ -131,6 +138,42 @@ export const SecurityStatusOverview: React.FC<SecurityStatusOverviewProps> = ({
                 </div>
               </div>
             </div>
+
+            {/* Threat Names Section - Only show if threats exist */}
+            {hasThreats && (
+              <div className="row g-4 mt-4">
+                <div className="col-12">
+                  <div className="alert alert-danger border border-danger bg-danger bg-opacity-10 mb-0">
+                    <div className="d-flex align-items-start">
+                      <div className="p-3 rounded-circle bg-danger bg-opacity-20 me-3">
+                        <i className="bi bi-exclamation-triangle-fill text-danger fs-3"></i>
+                      </div>
+                      <div className="flex-grow-1">
+                        <div className="d-flex align-items-center mb-3">
+                          <i className="bi bi-bug-fill text-danger me-2 fs-5"></i>
+                          <h6 className="text-danger mb-0 fw-bold">Detected Threats</h6>
+                          <span className="badge bg-danger ms-2">{validThreatNames.length}</span>
+                        </div>
+                        <div className="d-flex flex-wrap gap-2">
+                          {validThreatNames.map((threatName, index) => (
+                            <div key={index} className="d-flex align-items-center bg-danger bg-opacity-15 border border-danger rounded px-3 py-2">
+                              <i className="bi bi-virus text-danger me-2"></i>
+                              <span className="text-danger fw-medium">{threatName}</span>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="mt-3 d-flex align-items-center">
+                          <i className="bi bi-info-circle text-danger me-2"></i>
+                          <small className="text-danger">
+                            These threats were identified by Windows Defender scanning engine
+                          </small>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
