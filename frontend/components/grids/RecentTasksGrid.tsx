@@ -1,0 +1,331 @@
+'use client';
+import Link from "next/link";
+import { AgGridReact } from 'ag-grid-react';
+import { ColDef, ICellRendererParams, ModuleRegistry } from 'ag-grid-community';
+import { AllCommunityModule } from 'ag-grid-community';
+import { Task } from '@/lib/types';
+
+// Register AG-Grid modules
+if (typeof window !== 'undefined') {
+  ModuleRegistry.registerModules([AllCommunityModule]);
+}
+
+interface RecentTasksGridProps {
+  tasks: Task[];
+}
+
+// Status Badge Renderer Component
+const StatusBadgeRenderer = (params: ICellRendererParams) => {
+  const { value } = params;
+  const field = params.colDef?.field;
+  
+  if (value === null || value === undefined || value === '') {
+    return <span style={{ color: '#9ca3af' }}>-</span>;
+  }
+  
+  let badgeClass = '';
+  let displayValue = value;
+  
+  if (field === 'amsi_result' || field === 'defender_result') {
+    if (value === 'Not Detected' || value === 'CLEAN') {
+      badgeClass = 'badge bg-success';
+      displayValue = 'Clean';
+    } else if (value === 'Detected' || value.includes('THREAT') || value.includes('DETECTED')) {
+      badgeClass = 'badge bg-danger';
+      displayValue = 'Threat';
+    } else {
+      badgeClass = 'badge bg-warning text-dark';
+      displayValue = String(value);
+    }
+  } else if (field === 'yara_matches') {
+    const yaraValue = Array.isArray(value) ? value.length : Number(value);
+    if (isNaN(yaraValue)) {
+      badgeClass = 'badge bg-warning text-dark';
+      displayValue = 'Invalid';
+    } else if (yaraValue > 0) {
+      badgeClass = 'badge bg-danger';
+      displayValue = `${yaraValue} Rules`;
+    } else {
+      badgeClass = 'badge bg-success';
+      displayValue = 'Clean';
+    }
+  } else if (field === 'task_status') {
+    if (value === 'COMPLETED') {
+      badgeClass = 'badge bg-success';
+      displayValue = 'Completed';
+    } else if (value === 'PENDING') {
+      badgeClass = 'badge bg-warning text-dark';
+      displayValue = 'Pending';
+    } else if (value === 'FAILED') {
+      badgeClass = 'badge bg-danger';
+      displayValue = 'Failed';
+    } else if (value === 'RUNNING') {
+      badgeClass = 'badge bg-info';
+      displayValue = 'Running';
+    } else {
+      badgeClass = 'badge bg-secondary';
+      displayValue = String(value);
+    }
+  }
+  
+  return (
+    <span 
+      className={badgeClass} 
+      style={{ 
+        fontSize: '0.75rem', 
+        fontWeight: '600',
+        padding: '0.25rem 0.5rem',
+        borderRadius: '0.375rem',
+        display: 'inline-block',
+        minWidth: 'fit-content'
+      }}
+    >
+      {displayValue}
+    </span>
+  );
+};
+
+// File Link Renderer Component
+const FileLinkRenderer = (params: ICellRendererParams) => {
+  const { value, data } = params;
+  
+  if (!value || !data?.uuid) {
+    return <span style={{ color: '#9ca3af' }}>-</span>;
+  }
+  
+  // Extract just the filename from the full path
+  const fileName = value.split('/').pop() || value;
+  
+  return (
+    <Link 
+      href={`/tasks/summary/${data.uuid}`}
+      className="text-decoration-none"
+      style={{ 
+        color: '#60a5fa',
+        transition: 'color 0.2s ease',
+        fontSize: '0.875rem',
+        fontWeight: '500',
+      }}
+      onMouseEnter={(e) => (e.target as HTMLElement).style.color = '#93c5fd'}
+      onMouseLeave={(e) => (e.target as HTMLElement).style.color = '#60a5fa'}
+    >
+      {fileName}
+    </Link>
+  );
+};
+
+// Date Formatter Component
+const DateRenderer = (params: ICellRendererParams) => {
+  const { value } = params;
+  
+  if (!value) {
+    return <span style={{ color: '#9ca3af' }}>-</span>;
+  }
+  
+  // Handle both timestamp (number) and string formats
+  let date: Date;
+  if (typeof value === 'number') {
+    date = new Date(value * 1000); // Convert Unix timestamp to milliseconds
+  } else if (typeof value === 'string') {
+    date = new Date(value);
+  } else {
+    return <span style={{ color: '#9ca3af' }}>Invalid Date</span>;
+  }
+  
+  if (isNaN(date.getTime())) {
+    return <span style={{ color: '#9ca3af' }}>Invalid Date</span>;
+  }
+  
+  return (
+    <span style={{ color: '#f3f4f6', fontSize: '0.875rem' }}>
+      {date.toLocaleString()}
+    </span>
+  );
+};
+
+export function RecentTasksGrid({ tasks }: RecentTasksGridProps) {
+  const columnDefs: ColDef[] = [
+    {
+      field: 'uuid',
+      headerName: 'UUID',
+      flex: 1,
+      minWidth: 200,
+      sortable: true,
+      filter: true,
+      filterParams: {
+        filterOptions: ['contains'],
+        suppressAndOrCondition: true,
+      },
+      cellStyle: { 
+        fontFamily: 'monospace',
+        fontSize: '0.8rem',
+        color: '#93c5fd'
+      },
+    },
+    {
+      field: 'file_name',
+      headerName: 'File Name',
+      cellRenderer: FileLinkRenderer,
+      flex: 1,
+      minWidth: 150,
+      sortable: true,
+      filter: true,
+      filterParams: {
+        filterOptions: ['contains', 'startsWith', 'endsWith'],
+        suppressAndOrCondition: true,
+      },
+    },
+    {
+      field: 'time_sent',
+      headerName: 'Time Sent',
+      cellRenderer: DateRenderer,
+      flex: 1,
+      minWidth: 140,
+      sortable: true,
+      filter: 'agDateColumnFilter',
+    },
+    {
+      field: 'time_updated',
+      headerName: 'Time Updated',
+      cellRenderer: DateRenderer,
+      flex: 1,
+      minWidth: 140,
+      sortable: true,
+      filter: 'agDateColumnFilter',
+    },
+    {
+      field: 'amsi_result',
+      headerName: 'AMSI Result',
+      cellRenderer: StatusBadgeRenderer,
+      flex: 1,
+      minWidth: 120,
+      sortable: true,
+      filter: true,
+      filterParams: {
+        filterOptions: ['equals'],
+        suppressAndOrCondition: true,
+      },
+    },
+    {
+      field: 'defender_result',
+      headerName: 'Defender Result',
+      cellRenderer: StatusBadgeRenderer,
+      flex: 1,
+      minWidth: 140,
+      sortable: true,
+      filter: true,
+      filterParams: {
+        filterOptions: ['equals'],
+        suppressAndOrCondition: true,
+      },
+    },
+    {
+      field: 'yara_matches',
+      headerName: 'Yara',
+      cellRenderer: StatusBadgeRenderer,
+      flex: 0.5,
+      minWidth: 80,
+      sortable: true,
+      filter: 'agNumberColumnFilter',
+    },
+    {
+      field: 'task_status',
+      headerName: 'Status',
+      cellRenderer: StatusBadgeRenderer,
+      flex: 1,
+      minWidth: 120,
+      sortable: true,
+      filter: true,
+      filterParams: {
+        filterOptions: ['equals'],
+        suppressAndOrCondition: true,
+      },
+    },
+  ];
+
+  const defaultColDef: ColDef = {
+    sortable: true,
+    filter: true,
+    resizable: true,
+    menuTabs: ['filterMenuTab'],
+  };
+
+  return (
+    <div 
+      className="ag-theme-alpine-dark w-100"
+      style={{
+        height: '400px',
+        backgroundColor: '#1f2937',
+        borderRadius: '8px',
+        overflow: 'hidden',
+        border: '1px solid #374151',
+      }}
+    >
+      <style jsx global>{`
+        .ag-theme-alpine-dark {
+          --ag-background-color: #1f2937 !important;
+          --ag-header-background-color: #374151 !important;
+          --ag-odd-row-background-color: #1f2937 !important;
+          --ag-even-row-background-color: #111827 !important;
+          --ag-row-hover-color: #374151 !important;
+          --ag-selected-row-background-color: #1e40af !important;
+          --ag-border-color: #4b5563 !important;
+          --ag-header-foreground-color: #f9fafb !important;
+          --ag-foreground-color: #f3f4f6 !important;
+          --ag-data-color: #f3f4f6 !important;
+          --ag-secondary-foreground-color: #9ca3af !important;
+          --ag-input-focus-border-color: #3b82f6 !important;
+          --ag-range-selection-border-color: #3b82f6 !important;
+          --ag-header-column-separator-color: #4b5563 !important;
+          --ag-row-border-color: #374151 !important;
+        }
+        
+        .ag-theme-alpine-dark .ag-root-wrapper {
+          background-color: #1f2937 !important;
+          border: 1px solid #374151 !important;
+          border-radius: 8px !important;
+        }
+        
+        .ag-theme-alpine-dark .ag-header {
+          background-color: #374151 !important;
+          border-bottom: 1px solid #4b5563 !important;
+        }
+        
+        .ag-theme-alpine-dark .ag-header-cell {
+          background-color: #374151 !important;
+          color: #f9fafb !important;
+          border-right: 1px solid #4b5563 !important;
+        }
+        
+        .ag-theme-alpine-dark .ag-row {
+          background-color: #1f2937 !important;
+          border-bottom: 1px solid #374151 !important;
+        }
+        
+        .ag-theme-alpine-dark .ag-row-even {
+          background-color: #111827 !important;
+        }
+        
+        .ag-theme-alpine-dark .ag-row:hover {
+          background-color: #374151 !important;
+        }
+        
+        .ag-theme-alpine-dark .ag-cell {
+          color: #f3f4f6 !important;
+          border-right: 1px solid #374151 !important;
+        }
+      `}</style>
+      <AgGridReact
+        rowData={tasks}
+        columnDefs={columnDefs}
+        defaultColDef={defaultColDef}
+        animateRows={true}
+        rowSelection="multiple"
+        suppressRowClickSelection={true}
+        headerHeight={48}
+        rowHeight={44}
+        domLayout="normal"
+      />
+    </div>
+  );
+} 

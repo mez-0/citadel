@@ -1,0 +1,232 @@
+{
+    "_id": {
+      "$oid": "67ba2ad652030e38e1776145"
+    },
+    "file_name": "/home/mez0/dev/citadel/samples/malware/098d23e059269dcd397938dd2de52cae88df03608616ff0105ec0ca6e03caf57.dat",
+    "file_size": 1117184,
+    "file_type": "application/x-dosexec",
+    "timestamp": "Tue Mar 27 21:13:16 2018 UTC",
+    "entropy": 2.2349684011417503,
+    "sha256": "7133516570dcf4a8535ed5765f44f7b8a183a3d4d31f5adcf29bc4d444c14918",
+    "tlsh": "T14335E0097440DFB7C93F1F300978E99EA6B8FD550BA3069FF28672251DB82C09E354A6",
+    "architecture": "x86",
+    "signed": false,
+    "internal_name": "",
+    "sections": [
+      {
+        "name": ".text",
+        "size": 96768,
+        "vsize": 98304,
+        "perm": "-r-x",
+        "flags": 1610612768,
+        "paddr": 1024,
+        "vaddr": 822218752
+      },
+      {
+        "name": ".rdata",
+        "size": 40448,
+        "vsize": 40960,
+        "perm": "-r--",
+        "flags": 1073741888,
+        "paddr": 97792,
+        "vaddr": 822317056
+      },
+      {
+        "name": ".data",
+        "size": 973312,
+        "vsize": 978944,
+        "perm": "-rw-",
+        "flags": {
+          "$numberLong": "3221225536"
+        },
+        "paddr": 138240,
+        "vaddr": 822358016
+      },
+      {
+        "name": ".reloc",
+        "size": 5632,
+        "vsize": 8192,
+        "perm": "-r--",
+        "flags": 1107296320,
+        "paddr": 1111552,
+        "vaddr": 823336960
+      }
+    ],
+    "imports": [
+      {
+        "ordinal": 1,
+        "bind": "NONE",
+        "type": "FUNC",
+        "name": "GetProcessHeap",
+        "libname": "KERNEL32.dll",
+        "plt": 822317256
+      },
+      {
+        "ordinal": 2,
+        "bind": "NONE",
+        "type": "FUNC",
+        "name": "SetStdHandle",
+        "libname": "KERNEL32.dll",
+        "plt": 822317260
+      },
+      {
+        "ordinal": 3,
+        "bind": "NONE",
+        "type": "FUNC",
+        "name": "HeapSize",
+        "libname": "KERNEL32.dll",
+        "plt": 822317264
+      }
+    ],
+    "exports": [],
+    "functions": [
+      {
+        "offset": 822241263,
+        "name": "entry0",
+        "size": 379,
+        "is_pure": "",
+        "realsz": 326,
+        "noreturn": false,
+        "recursive": false,
+        "stackframe": 32,
+        "calltype": "cdecl",
+        "cost": 170,
+        "cc": 12,
+        "bits": 32,
+        "type": "fcn",
+        "nbbs": 21,
+        "tracecov": 76,
+        "is_lineal": false,
+        "ninstrs": 106,
+        "edges": 29,
+        "ebbs": 2,
+        "signature": "entry0 ();",
+        "minbound": 822240894,
+        "maxbound": 822241273,
+        "maxbbins": 12,
+        "midbbins": 5.048,
+        "ratbbins": 2.377,
+        "indegree": 0,
+        "outdegree": 23,
+        "nlocals": 4,
+        "nargs": 0,
+        "difftype": "new"
+      },
+      {
+        "offset": 822312832,
+        "name": "main",
+        "size": 207,
+        "is_pure": "",
+        "realsz": 179,
+        "noreturn": false,
+        "recursive": false,
+        "stackframe": 56,
+        "calltype": "cdecl",
+        "cost": 79,
+        "cc": 1,
+        "bits": 32,
+        "type": "fcn",
+        "nbbs": 2,
+        "tracecov": 100,
+        "is_lineal": false,
+        "ninstrs": 56,
+        "edges": 1,
+        "ebbs": 1,
+        "signature": "int main (int argc, char **argv, char **envp);",
+        "minbound": 822312832,
+        "maxbound": 822313039,
+        "maxbbins": 47,
+        "midbbins": 28,
+        "ratbbins": 1.679,
+        "indegree": 1,
+        "outdegree": 9,
+        "nlocals": 7,
+        "nargs": 0,
+        "difftype": "new"
+      }
+    ],
+    "entrypoint": [
+      {
+        "paddr": 23535,
+        "vaddr": 822241263,
+        "baddr": 822214656,
+        "laddr": 0,
+        "haddr": 296,
+        "type": "program"
+      }
+    ],
+    "certificates": [],
+    "optional_headers": {
+      "addressofentrypoint": 26607,
+      "baseofcode": 4096,
+      "checksum": 0,
+      "dllcharacteristics": 33088,
+      "filealignment": 512,
+      "imagedllcharacteristicsappcontainer": false,
+      "imagedllcharacteristicsdynamicbase": false,
+      "imagedllcharacteristicsforceintegrity": false,
+      "imagedllcharacteristicsguardcf": false,
+      "imagedllcharacteristicshighentropyva": false,
+      "imagedllcharacteristicsnobind": false,
+      "imagedllcharacteristicsnoisolation": false,
+      "imagedllcharacteristicsnoseh": false,
+      "imagedllcharacteristicsnxcompat": false,
+      "imagedllcharacteristicsterminalserveraware": false,
+      "imagedllcharacteristicswdmdriver": false,
+      "imagebase": 822214656,
+      "loaderflags": 0,
+      "magic": 267,
+      "majorimageversion": 0,
+      "majorlinkerversion": 17,
+      "majoroperatingsystemversion": 5,
+      "majorsubsystemversion": 5,
+      "minorimageversion": 0,
+      "minorlinkerversion": 18,
+      "minoroperatingsystemversion": 1,
+      "minorsubsystemversion": 1,
+      "numberofrvaandsizes": 16,
+      "reserved1": 0,
+      "sectionalignment": 4096,
+      "sizeofcode": 96768,
+      "sizeofheaders": 1024,
+      "sizeofheapcommit": 36864,
+      "sizeofheapreserve": 1499136,
+      "sizeofimage": 1130496,
+      "sizeofinitializeddata": 1023488,
+      "sizeofstackcommit": 32768,
+      "sizeofstackreserve": 1159168,
+      "sizeofuninitializeddata": 0,
+      "subsystem": 0,
+      "name": "IMAGE_OPTIONAL_HEADER"
+    },
+    "compilers": [
+      {
+        "info": "C++",
+        "name": "Microsoft Visual C/C++",
+        "string": "Compiler: Microsoft Visual C/C++(19.13.26129)[C++]",
+        "type": "compiler",
+        "version": "19.13.26129"
+      }
+    ],
+    "libraries": [],
+    "linkers": [
+      {
+        "info": "",
+        "name": "Microsoft Linker",
+        "string": "Linker: Microsoft Linker(14.13.26129)",
+        "type": "linker",
+        "version": "14.13.26129"
+      }
+    ],
+    "packers": [],
+    "sign_tools": [],
+    "tools": [
+      {
+        "info": "",
+        "name": "Visual Studio",
+        "string": "Tool: Visual Studio(2017, v15.6)",
+        "type": "tool",
+        "version": "2017, v15.6"
+      }
+    ]
+  }

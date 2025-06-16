@@ -1,0 +1,82 @@
+/* Tab Content Styles */
+.tab-content {
+  position: relative;
+  min-height: 200px; /* Ensure minimum height to prevent layout shifts */
+}
+
+.tab-pane {
+  display: none;
+  opacity: 0;
+  transition: opacity 0.15s linear;
+}
+
+.tab-pane.show {
+  display: block;
+  opacity: 1;
+}
+
+/* Card Styles */
+.card {
+  margin-bottom: 1rem;
+  transition: all 0.2s ease-in-out;
+}
+
+/* AG Grid Theme Overrides */
+.ag-theme-alpine {
+  --ag-background-color: #1f2937;
+  --ag-header-background-color: #374151;
+  --ag-odd-row-background-color: #1f2937;
+  --ag-row-border-color: #374151;
+  --ag-header-foreground-color: #f3f4f6;
+  --ag-foreground-color: #f3f4f6;
+  --ag-font-size: 14px;
+  --ag-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Ensure proper stacking context */
+.card-body {
+  position: relative;
+  z-index: 1;
+}
+
+/* Prevent content overflow */
+.tab-content > .tab-pane {
+  overflow: hidden;
+}
+
+/* Smooth transitions for tab switching */
+.nav-tabs .nav-link {
+  transition: all 0.2s ease-in-out;
+}
+
+.nav-tabs .nav-link.active {
+  background-color: #374151;
+  border-color: #4b5563;
+  color: #f3f4f6;
+}
+
+/* Ensure proper spacing between cards */
+.row.g-4 {
+  margin-bottom: 1rem;
+}
+
+/* Fix for AG Grid container */
+.ag-theme-alpine {
+  width: 100% !important;
+  height: auto !important;
+  min-height: 200px;
+}
+
+/* Ensure proper tab content visibility */
+.tab-content > .tab-pane:not(.show) {
+  display: none !important;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Prevent content jumping during tab switches */
+.tab-content {
+  contain: content;
+  will-change: contents;
+} 
