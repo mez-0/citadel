@@ -1,4 +1,6 @@
+import os
 from dataclasses import dataclass, field
+from pathlib import Path
 
 from dataclasses_json import dataclass_json
 
@@ -174,7 +176,17 @@ class PayloadFile:
     packers: list[DetectItEasy] = field(default_factory=list)
     sign_tools: list[DetectItEasy] = field(default_factory=list)
     tools: list[DetectItEasy] = field(default_factory=list)
+    strings_file_path: str = field(default_factory=str)
 
     def __post_init__(self):
         if self.certificates:
             self.signed = True
+
+        if self.sha256:
+            p = Path.home()
+
+            strings_dir = p / ".citadel" / "strings"
+
+            strings_dir.mkdir(parents=True, exist_ok=True)
+
+            self.strings_file_path = str(strings_dir / f"{self.sha256}.json")

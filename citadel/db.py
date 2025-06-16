@@ -1,4 +1,7 @@
+import json
+import os
 from dataclasses import dataclass, field
+from pathlib import Path
 
 import motor.motor_asyncio
 from dataclasses_json import dataclass_json
@@ -6,6 +9,7 @@ from pymongo import collection
 
 from citadel import logger
 from citadel.enums import COLLECTION_MAPPINGS, MONGO_COLLECTIONS
+from citadel.models.PayloadFile import PayloadFile
 
 
 @dataclass_json
@@ -130,6 +134,10 @@ class CitadelDatabaseApi:
             # convert it back
             o = object_type.from_dict(doc)
 
+            # Load strings from file if this is a PayloadFile
+            if collections == MONGO_COLLECTIONS.PAYLOADS:
+                await self._load_strings_from_file(o)
+
             # now we can append it to the list
             objects.append(o)
 
@@ -171,7 +179,15 @@ class CitadelDatabaseApi:
         found_object = await db_collection.find_one({"uuid": uuid})
 
         if found_object:
-            return object_Type.from_dict(found_object)
+            obj = object_Type.from_dict(found_object)
+
+            # Load strings from file if this is a PayloadFile
+            if collections == MONGO_COLLECTIONS.PAYLOADS:
+                # Ensure __post_init__ is called to set strings_file_path
+                obj.__post_init__()
+                await self._load_strings_from_file(obj)
+
+            return obj
         else:
             return None
 
@@ -310,7 +326,15 @@ class CitadelDatabaseApi:
         found_object = await db_collection.find_one({"sha256": sha256})
 
         if found_object:
-            return object_type.from_dict(found_object)
+            payload = object_type.from_dict(found_object)
+
+            # Ensure __post_init__ is called to set strings_file_path
+            payload.__post_init__()
+
+            # Load strings from file
+            await self._load_strings_from_file(payload)
+
+            return payload
         else:
             return None
 
@@ -392,7 +416,29 @@ class CitadelDatabaseApi:
         try:
             amount_inserted = 0
 
-            insertions = await db_collection.insert_many([p.to_dict() for p in inserts])
+            # Handle PayloadFile objects specially
+            processed_inserts = []
+            for obj in inserts:
+                if (
+                    collections == MONGO_COLLECTIONS.PAYLOADS
+                    and hasattr(obj, "strings")
+                    and hasattr(obj, "strings_file_path")
+                ):
+                    # Export strings to file before database insertion
+                    await self._export_strings_to_file(obj)
+
+                    # Create a copy of the object without the strings field for database storage
+                    obj_dict = obj.to_dict()
+                    obj_dict["strings"] = []  # Clear strings to save database space
+
+                    modified_obj = PayloadFile.from_dict(obj_dict)
+                    processed_inserts.append(modified_obj)
+                else:
+                    processed_inserts.append(obj)
+
+            insertions = await db_collection.insert_many(
+                [p.to_dict() for p in processed_inserts]
+            )
 
             amount_inserted += len(insertions.inserted_ids)
 
@@ -401,6 +447,37 @@ class CitadelDatabaseApi:
         except Exception as e:
             logger.bad(f"Failed to insert into {collections} database: {e}")
             return 0
+
+    async def _export_strings_to_file(self, payload_file):
+        """
+        Export strings from a PayloadFile to a log file
+
+        :param payload_file: PayloadFile object containing strings to export
+        :type payload_file: PayloadFile
+        """
+        try:
+            if not payload_file.strings or not payload_file.strings_file_path:
+                return
+
+            # Create the directory if it doesn't exist
+            file_path = Path(payload_file.strings_file_path)
+            file_path.parent.mkdir(parents=True, exist_ok=True)
+
+            # Export strings to file
+            with open(payload_file.strings_file_path, "w", encoding="utf-8") as f:
+                for string_obj in payload_file.strings:
+                    # Convert each BinaryString to JSON and write to file
+                    string_json = string_obj.to_json()
+                    f.write(string_json + "\n")
+
+            logger.debug(
+                f"Exported {len(payload_file.strings)} strings to {payload_file.strings_file_path}",
+                self.debug,
+            )
+
+        except Exception as e:
+            logger.bad(f"Failed to export strings to file: {e}")
+            # Don't raise the exception, just log it so database insertion can continue
 
     async def do_update(
         self, updates: list[object], collections: MONGO_COLLECTIONS
@@ -442,3 +519,41 @@ class CitadelDatabaseApi:
         except Exception as e:
             logger.bad(f"Failed to update {collections} database: {e}")
             return 0
+
+    async def _load_strings_from_file(self, payload_file):
+        """
+        Load strings from a log file into a PayloadFile object
+
+        :param payload_file: PayloadFile object to load strings into
+        :type payload_file: PayloadFile
+        """
+        try:
+            if not payload_file.strings_file_path or not os.path.exists(
+                payload_file.strings_file_path
+            ):
+                return
+
+            from citadel.models.PayloadFile import BinaryString
+
+            # Load strings from file
+            with open(payload_file.strings_file_path, "r", encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    if line:
+                        try:
+                            binary_string = BinaryString.from_json(line)
+                            payload_file.strings.append(binary_string)
+                        except (json.JSONDecodeError, ValueError) as e:
+                            logger.warning(
+                                f"Failed to parse string line: {line} - {e}", self.debug
+                            )
+                            continue
+
+            logger.debug(
+                f"Loaded {len(payload_file.strings)} strings from {payload_file.strings_file_path}",
+                self.debug,
+            )
+
+        except Exception as e:
+            logger.bad(f"Failed to load strings from file: {e}")
+            # Don't raise the exception, just log it and continue with empty strings

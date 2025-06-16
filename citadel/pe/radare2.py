@@ -178,7 +178,15 @@ class Radare2Handler:
         if not strings_json_str:
             return []
 
-        return self.get_sample_str_as_object(BinaryString, strings_json_str, "strings")
+        strings = self.get_sample_str_as_object(
+            BinaryString, strings_json_str, "strings"
+        )
+
+        return [
+            string
+            for string in strings
+            if string.string and 5 < len(string.string) < 100
+        ]
 
     def get_imports(self) -> list[BinaryImportExport]:
         """
