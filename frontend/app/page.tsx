@@ -76,14 +76,14 @@ export default function Home() {
     <div className="min-h-screen bg-gray-900 text-white">
       <div className="container-fluid px-4 py-6">
         {/* Key Metrics */}
-        <div className="row g-4 mb-4">
+        <div className="row g-3 mb-4">
           <div className="col-xl-2 col-md-4 col-sm-6">
             <div className="card bg-gray-800 border-gray-700 h-100">
-              <div className="card-body text-center">
+              <div className="card-body text-center py-3">
                 <div className="text-primary mb-2">
-                  <i className="bi bi-files fs-1"></i>
+                  <i className="bi bi-files fs-3"></i>
                 </div>
-                <h3 className="text-white mb-1">{stats.totalTasks.toLocaleString()}</h3>
+                <h5 className="text-white mb-1">{stats.totalTasks.toLocaleString()}</h5>
                 <p className="text-gray-400 mb-0 small">Total Files</p>
               </div>
             </div>
@@ -91,11 +91,11 @@ export default function Home() {
           
           <div className="col-xl-2 col-md-4 col-sm-6">
             <div className="card bg-gray-800 border-gray-700 h-100">
-              <div className="card-body text-center">
+              <div className="card-body text-center py-3">
                 <div className="text-success mb-2">
-                  <i className="bi bi-check-circle fs-1"></i>
+                  <i className="bi bi-check-circle fs-3"></i>
                 </div>
-                <h3 className="text-white mb-1">{stats.completedTasks.toLocaleString()}</h3>
+                <h5 className="text-white mb-1">{stats.completedTasks.toLocaleString()}</h5>
                 <p className="text-gray-400 mb-0 small">Completed</p>
               </div>
             </div>
@@ -103,11 +103,11 @@ export default function Home() {
           
           <div className="col-xl-2 col-md-4 col-sm-6">
             <div className="card bg-gray-800 border-gray-700 h-100">
-              <div className="card-body text-center">
+              <div className="card-body text-center py-3">
                 <div className="text-warning mb-2">
-                  <i className="bi bi-clock fs-1"></i>
+                  <i className="bi bi-clock fs-3"></i>
                 </div>
-                <h3 className="text-white mb-1">{stats.pendingTasks.toLocaleString()}</h3>
+                <h5 className="text-white mb-1">{stats.pendingTasks.toLocaleString()}</h5>
                 <p className="text-gray-400 mb-0 small">Pending</p>
               </div>
             </div>
@@ -115,11 +115,11 @@ export default function Home() {
           
           <div className="col-xl-2 col-md-4 col-sm-6">
             <div className="card bg-gray-800 border-gray-700 h-100">
-              <div className="card-body text-center">
+              <div className="card-body text-center py-3">
                 <div className="text-danger mb-2">
-                  <i className="bi bi-exclamation-triangle fs-1"></i>
+                  <i className="bi bi-exclamation-triangle fs-3"></i>
                 </div>
-                <h3 className="text-white mb-1">{stats.threatsDetected.toLocaleString()}</h3>
+                <h5 className="text-white mb-1">{stats.threatsDetected.toLocaleString()}</h5>
                 <p className="text-gray-400 mb-0 small">Threats Detected</p>
               </div>
             </div>
@@ -127,11 +127,11 @@ export default function Home() {
           
           <div className="col-xl-2 col-md-4 col-sm-6">
             <div className="card bg-gray-800 border-gray-700 h-100">
-              <div className="card-body text-center">
+              <div className="card-body text-center py-3">
                 <div className="text-success mb-2">
-                  <i className="bi bi-shield-check fs-1"></i>
+                  <i className="bi bi-shield-check fs-3"></i>
                 </div>
-                <h3 className="text-white mb-1">{stats.cleanFiles.toLocaleString()}</h3>
+                <h5 className="text-white mb-1">{stats.cleanFiles.toLocaleString()}</h5>
                 <p className="text-gray-400 mb-0 small">Clean Files</p>
               </div>
             </div>
@@ -139,13 +139,13 @@ export default function Home() {
           
           <div className="col-xl-2 col-md-4 col-sm-6">
             <div className="card bg-gray-800 border-gray-700 h-100">
-              <div className="card-body text-center">
+              <div className="card-body text-center py-3">
                 <div className="text-info mb-2">
-                  <i className="bi bi-graph-up fs-1"></i>
+                  <i className="bi bi-graph-up fs-3"></i>
                 </div>
-                <h3 className="text-white mb-1">
+                <h5 className="text-white mb-1">
                   {stats.totalTasks > 0 ? Math.round((stats.threatsDetected / stats.totalTasks) * 100) : 0}%
-                </h3>
+                </h5>
                 <p className="text-gray-400 mb-0 small">Detection Rate</p>
               </div>
             </div>

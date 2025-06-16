@@ -33,10 +33,10 @@ interface ThreatDistributionChartProps {
 export function ThreatDistributionChart({ data }: ThreatDistributionChartProps) {
   if (!data || data.length === 0) {
     return (
-      <div className="d-flex align-items-center justify-content-center" style={{ height: '300px' }}>
+      <div className="d-flex align-items-center justify-content-center" style={{ height: '200px' }}>
         <div className="text-center">
-          <i className="bi bi-pie-chart text-muted" style={{ fontSize: '3rem' }}></i>
-          <p className="text-muted mt-2 mb-0">No threat data available</p>
+          <i className="bi bi-pie-chart text-muted" style={{ fontSize: '2rem' }}></i>
+          <p className="text-muted mt-2 mb-0 small">No threat data available</p>
         </div>
       </div>
     );
@@ -66,10 +66,10 @@ export function ThreatDistributionChart({ data }: ThreatDistributionChartProps) 
       fill: '#1f2937', // gray-800 to match card background
     },
     padding: {
-      top: 20,
-      right: 20,
-      bottom: 20,
-      left: 20,
+      top: 10,
+      right: 10,
+      bottom: 10,
+      left: 10,
     },
     series: [{
       type: 'pie',
@@ -107,10 +107,10 @@ export function ThreatDistributionChart({ data }: ThreatDistributionChartProps) 
       },
       calloutLabel: {
         enabled: true,
-        fontSize: 13,
+        fontSize: 11,
         fontWeight: 600,
         color: '#f9fafb',
-        minAngle: 5, // Only show callout labels for sectors larger than 5 degrees
+        minAngle: 8, // Only show callout labels for sectors larger than 8 degrees
         formatter: ({ datum }: { datum: ThreatData }) => {
           const total = data.reduce((sum, item) => sum + item.value, 0);
           const percentage = ((datum.value / total) * 100).toFixed(1);
@@ -118,20 +118,20 @@ export function ThreatDistributionChart({ data }: ThreatDistributionChartProps) 
         },
       },
       calloutLine: {
-        length: 18,
-        strokeWidth: 1.5,
+        length: 12,
+        strokeWidth: 1,
         colors: ['#6b7280'], // gray-500
       },
       sectorLabel: {
         enabled: true,
-        fontSize: 12,
+        fontSize: 10,
         fontWeight: 600,
         color: '#ffffff',
         formatter: ({ datum }: { datum: ThreatData }) => {
           const total = data.reduce((sum, item) => sum + item.value, 0);
           const percentage = ((datum.value / total) * 100).toFixed(1);
-          // Only show percentage in sector if it's large enough (> 8%)
-          return percentage > '8.0' ? `${percentage}%` : '';
+          // Only show percentage in sector if it's large enough (> 10%)
+          return percentage > '10.0' ? `${percentage}%` : '';
         },
       },
       tooltip: {
@@ -141,39 +141,39 @@ export function ThreatDistributionChart({ data }: ThreatDistributionChartProps) 
           const isHighThreat = datum.value > (total / data.length);
           
           return {
-            content: `<div style="background: #1e293b; padding: 16px; border-radius: 12px; border: 1px solid #475569; box-shadow: 0 8px 24px rgba(0,0,0,0.4); min-width: 200px;">
-              <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                <div style="width: 12px; height: 12px; border-radius: 50%; background: ${ENHANCED_COLORS[data.findIndex(item => item.name === datum.name) % ENHANCED_COLORS.length].fill}; margin-right: 8px;"></div>
-                <div style="color: #ffffff; font-weight: 600; font-size: 14px;">${datum.name}</div>
+            content: `<div style="background: #1e293b; padding: 12px; border-radius: 8px; border: 1px solid #475569; box-shadow: 0 4px 12px rgba(0,0,0,0.4); min-width: 180px;">
+              <div style="display: flex; align-items: center; margin-bottom: 6px;">
+                <div style="width: 10px; height: 10px; border-radius: 50%; background: ${ENHANCED_COLORS[data.findIndex(item => item.name === datum.name) % ENHANCED_COLORS.length].fill}; margin-right: 6px;"></div>
+                <div style="color: #ffffff; font-weight: 600; font-size: 13px;">${datum.name}</div>
               </div>
-              <div style="color: #94a3b8; font-size: 13px; margin-bottom: 4px;">${datum.value} threats (${percentage}%)</div>
-              ${isHighThreat ? '<div style="color: #fbbf24; font-size: 12px; font-weight: 500;">⚠️ Above average threat level</div>' : ''}
+              <div style="color: #94a3b8; font-size: 12px; margin-bottom: 3px;">${datum.value} threats (${percentage}%)</div>
+              ${isHighThreat ? '<div style="color: #fbbf24; font-size: 11px; font-weight: 500;">⚠️ Above average threat level</div>' : ''}
             </div>`,
           };
         },
       },
     } as AgPieSeriesOptions],
     legend: {
-      enabled: true,
+      enabled: false,
       position: 'bottom',
-      spacing: 20,
-      maxWidth: 600,
+      spacing: 15,
+      maxWidth: 500,
       toggleSeries: false, // Disable series toggling for pie charts
       preventHidingAll: true,
       item: {
-        paddingX: 20,
-        paddingY: 10,
-        maxWidth: 180,
+        paddingX: 15,
+        paddingY: 6,
+        maxWidth: 150,
         marker: {
-          size: 12,
+          size: 10,
           strokeWidth: 0,
           shape: 'circle',
         },
         label: {
           color: '#f9fafb',
-          fontSize: 13,
+          fontSize: 12,
           fontWeight: 500,
-          maxLength: 20,
+          maxLength: 18,
           // Enhanced label formatter with threat count
           formatter: ({ value }: { value: string }) => {
             const threatItem = data.find(item => item.name === value);
@@ -201,7 +201,7 @@ export function ThreatDistributionChart({ data }: ThreatDistributionChartProps) 
 
   return (
     <div className="w-100 h-100 d-flex align-items-center justify-content-center">
-      <div style={{ width: '100%', height: '100%', minHeight: '320px' }}>
+      <div style={{ width: '100%', height: '100%', minHeight: '220px' }}>
         <AgCharts options={chartOptions} />
       </div>
     </div>

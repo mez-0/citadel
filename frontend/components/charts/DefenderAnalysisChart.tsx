@@ -174,15 +174,7 @@ export function DefenderAnalysisChart({ data }: DefenderAnalysisChartProps) {
   };
 
   return (
-    <div 
-      className="w-100 h-100 d-flex align-items-center justify-content-center"
-      style={{
-        backgroundColor: '#1f2937',
-        borderRadius: '8px',
-        border: '1px solid #374151',
-        padding: '16px',
-      }}
-    >
+    <div className="w-100 h-100 d-flex align-items-center justify-content-center">
       <div style={{ width: '100%', height: '100%', minHeight: '320px' }}>
         <AgCharts options={chartOptions} />
       </div>

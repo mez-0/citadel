@@ -25,6 +25,7 @@ const StatusBadgeRenderer = (params: ICellRendererParams) => {
   
   let badgeClass = '';
   let displayValue = value;
+  let customStyle = {};
   
   if (field === 'amsi_result') {
     if (value === 'AMSI_RESULT_NOT_DETECTED') {
@@ -40,23 +41,34 @@ const StatusBadgeRenderer = (params: ICellRendererParams) => {
       badgeClass = 'badge bg-danger';
     }
     displayValue = String(value);
-  } else if (field === 'yara_matches') {
-    const yaraValue = Array.isArray(value) ? value.length : Number(value);
-    if (isNaN(yaraValue)) {
-      badgeClass = 'badge bg-secondary';
-      displayValue = '0';
-    } else {
-      badgeClass = 'badge bg-secondary';
-      displayValue = String(yaraValue);
-    }
   } else if (field === 'ember_result') {
     const score = Number(value);
     if (isNaN(score) || value === null || value === undefined) {
-      badgeClass = 'badge bg-secondary';
+      badgeClass = 'badge';
       displayValue = 'N/A';
+      customStyle = {
+        backgroundColor: '#6b7280',
+        color: '#ffffff'
+      };
     } else {
-      badgeClass = 'badge bg-secondary';
+      badgeClass = 'badge';
       displayValue = score.toFixed(4);
+      
+      // Create color gradient from green (0) to red (1)
+      const clampedScore = Math.max(0, Math.min(1, score));
+      const red = Math.round(clampedScore * 255);
+      const green = Math.round((1 - clampedScore) * 255);
+      const blue = 0;
+      
+      // Calculate luminance to determine text color
+      const luminance = (0.299 * red + 0.587 * green + 0.114 * blue) / 255;
+      const textColor = luminance > 0.5 ? '#000000' : '#ffffff';
+      
+      customStyle = {
+        backgroundColor: `rgb(${red}, ${green}, ${blue})`,
+        color: textColor,
+        border: 'none'
+      };
     }
   } else if (field === 'task_status') {
     if (value === 'COMPLETED') {
@@ -86,7 +98,8 @@ const StatusBadgeRenderer = (params: ICellRendererParams) => {
         padding: '0.25rem 0.5rem',
         borderRadius: '0.375rem',
         display: 'inline-block',
-        minWidth: 'fit-content'
+        minWidth: 'fit-content',
+        ...customStyle
       }}
     >
       {displayValue}
@@ -210,15 +223,6 @@ export function RecentTasksGrid({ tasks }: RecentTasksGridProps) {
         filterOptions: ['equals'],
         suppressAndOrCondition: true,
       },
-    },
-    {
-      field: 'yara_matches',
-      headerName: 'Yara',
-      cellRenderer: StatusBadgeRenderer,
-      flex: 0.5,
-      minWidth: 80,
-      sortable: true,
-      filter: 'agNumberColumnFilter',
     },
     {
       field: 'ember_result',
