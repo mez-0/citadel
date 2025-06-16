@@ -1,36 +1,99 @@
-# Citadel 🛡️
+# Citadel 🏰
 
-Citadel is a payload analysis framework that I built to enable me to review payloads prior to using them on engagements. The inner PE parsing logic will also be used for future projects and will act as a core component to my research projects. My extension of the preprocessing phase and the addition of the capability detectors, Citadel will report on [MITRE ATT&CK](https://attack.mitre.org/) and [Malware Behavior Catalog](https://github.com/MBCProject/mbc-markdown).
+A binary static analysis framework for payload analysis and malware research. Citadel helps identify why implants are being detected statically by providing comprehensive PE parsing, capability detection, and similarity analysis through a modern web interface.
 
 ## 🎯 Overview
 
-Figuring out why an implant is being detected (statically) is a frustrating game. Tools such as ThreatCheck and GoCheck exist to tackle this problem, and do a decent job. However, an issue I had with these is that when I want to execute it, I need to copy a file onto a Virtual Machine. But, at this point, Defender would eat it before I even got to test it. That's where projects like avred come in, this introduces a HTTP API to allow a more remote implementation.
+Citadel addresses the frustration of static detection analysis by providing:
+- **Remote Analysis**: HTTP API to avoid copying files to VMs where Defender might interfere
+- **Comprehensive PE Parsing**: Multiple parsers for thorough binary analysis
+- **Capability Detection**: MITRE ATT&CK and Malware Behavior Catalog mapping
+- **Similarity Analysis**: TLSH fuzzy hashing for sample clustering
+- **Modern UI**: Clean dashboard for analysis results
 
-## 🚀 Installation
+## 🚀 Quick Start
 
-See detailed installation guide at: [mez0.cc/posts/citadel/#installing](https://mez0.cc/posts/citadel/#installing)
+### Prerequisites
+- Python 3.10+
+- MongoDB
+- Windows VM (for the .NET agent)
+
+### Installation
+
+#### Automated
 
 ```bash
-git clone https://github.com/radareorg/radare2.git
-cd radare2
-sys/install.sh
-python3 -m venv venv
-source venv/bin/activate
-pip install .
+bash install.sh
 ```
 
-## 🔧 Parsers
+#### Manual
 
-| Parser (Link)                                               | Description                                                                                |
-| ----------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| [LIEF](https://github.com/lief-project/LIEF)                | For internal file names and export details                                                 |
-| [PEFILE](https://github.com/erocarrera/pefile)              | For optional headers, timestamps, and code-signing information                             |
-| [Radare2](https://github.com/radareorg/radare2)             | For detailed binary analysis, including sections, imports, exports, functions, and strings |
-| [Detect-It-Easy](https://github.com/horsicq/Detect-It-Easy) | For identifying compilers, libraries, linkers, packers, and tools                          |
+1. **Clone and install Citadel**:
+   ```bash
+   git clone https://github.com/mez-0/citadel
+   cd citadel
+   uv pip install .
+   ```
 
-## 🔗 Capability Detectors
+2. **Install Radare2**:
+   ```bash
+   git clone https://github.com/radareorg/radare2.git
+   cd radare2
+   sys/install.sh
+   ```
 
-| Project                                                                | Description                                                                                                                                                                                                    |
-| ---------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [capa](https://github.com/mandiant/capa)                               | The FLARE team's open-source tool to identify capabilities in executable files                                                                                                                                 |
-| [Malware Behavior Catalog](https://github.com/MBCProject/mbc-markdown) | The Malware Behavior Catalog (MBC) is a catalog of malware objectives and behaviors, created to support malware analysis-oriented use cases, such as labeling, similarity analysis, and standardized reporting |
+3. **Install EMBER2024**:
+   ```bash
+   git clone https://github.com/FutureComputing4AI/EMBER2024
+   uv pip install ./EMBER2024
+   ```
+
+4. **Setup TLSH database**:
+   ```bash
+   cd citadel
+   tar -xvf data/tlsh.tar.gz
+   python3 scripts/upload_tlsh_map.py
+   ```
+
+5. **Start the API server**:
+   ```bash
+   python3 api/api.py
+   ```
+
+6. **Run the Windows agent** (on Windows VM):
+   ```bash
+   .\Citadel.Static.exe http://YOUR_API_IP:5566
+   ```
+
+## 📊 Usage
+
+```bash
+python3 citadel.py -f sample.exe --show-ascii-bytes --tlsh-distance 50
+```
+
+Access the web interface at `http://127.0.0.1:5566`
+
+## 🔧 Analysis Components
+
+| Component | Description |
+|-----------|-------------|
+| **PE Parsing** | LIEF, PEFILE, Radare2, Detect-It-Easy |
+| **Capability Detection** | CAPA, Malware Behavior Catalog |
+| **Similarity Analysis** | TLSH fuzzy hashing |
+| **Static Detection** | Defender scanning with chunking analysis |
+
+## 🎨 Features
+
+- **Multiple Scanning Methods**: 0→X, X→Y, and thorough chunk analysis
+- **Function Categorization**: LLM-powered Windows API categorization  
+- **Visual Analytics**: Entropy charts, import analysis, detection heatmaps
+- **MITRE ATT&CK Mapping**: Automated technique identification
+- **Compiler Detection**: Tool and build chain identification
+
+## 📚 Documentation
+
+For detailed setup instructions and advanced configuration, see: [mez0.cc/posts/citadel](https://mez0.cc/posts/citadel/)
+
+## ⚠️ Note
+
+Requires a Windows VM with updated Windows Defender for the scanning agent. Consider disabling toast notifications for smoother operation.
