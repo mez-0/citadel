@@ -20,8 +20,24 @@ export const SecurityStatusOverview: React.FC<SecurityStatusOverviewProps> = ({
     return result === 'DEFENDER_RESULT_NOT_DETECTED';
   };
 
+  const getEmberStatus = () => {
+    if (!data.ember_result) return { score: 0, prediction: 'N/A', color: 'text-gray-400', bgColor: 'bg-gray-600', borderColor: 'border-gray-500' };
+    
+    const score = data.ember_result.score || 0;
+    const prediction = data.ember_result.prediction || 'Unknown';
+    
+    if (prediction.toLowerCase().includes('malware') || score > 0.7) {
+      return { score, prediction, color: 'text-danger', bgColor: 'bg-danger', borderColor: 'border-danger' };
+    } else if (score > 0.3) {
+      return { score, prediction, color: 'text-warning', bgColor: 'bg-warning', borderColor: 'border-warning' };
+    } else {
+      return { score, prediction, color: 'text-success', bgColor: 'bg-success', borderColor: 'border-success' };
+    }
+  };
+
   const amsiClean = getAmsiResult();
   const defenderClean = getDefenderResult();
+  const emberStatus = getEmberStatus();
 
   return (
     <div className={`row g-4 mb-4 ${className}`}>
@@ -36,7 +52,7 @@ export const SecurityStatusOverview: React.FC<SecurityStatusOverviewProps> = ({
           <div className="card-body">
             <div className="row g-4">
               {/* AMSI Status */}
-              <div className="col-md-6">
+              <div className="col-lg-4 col-md-6">
                 <div className={`p-4 rounded-lg border ${
                   amsiClean 
                     ? 'bg-success bg-opacity-10 border-success' 
@@ -66,7 +82,7 @@ export const SecurityStatusOverview: React.FC<SecurityStatusOverviewProps> = ({
               </div>
               
               {/* Defender Status */}
-              <div className="col-md-6">
+              <div className="col-lg-4 col-md-6">
                 <div className={`p-4 rounded-lg border ${
                   defenderClean 
                     ? 'bg-success bg-opacity-10 border-success' 
@@ -94,28 +110,24 @@ export const SecurityStatusOverview: React.FC<SecurityStatusOverviewProps> = ({
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* Overall Status */}
-            <div className="mt-4 p-3 rounded-lg bg-gray-700 border border-gray-600">
-              <div className="d-flex align-items-center justify-content-between">
-                <div className="d-flex align-items-center">
-                  <i className={`bi ${
-                    amsiClean && defenderClean 
-                      ? 'bi-check-circle-fill text-success' 
-                      : 'bi-exclamation-triangle-fill text-danger'
-                  } fs-4 me-3`}></i>
-                  <div>
-                    <h6 className="text-white mb-0">Overall Security Assessment</h6>
-                    <p className="text-gray-400 mb-0 small">
-                      Based on AMSI and Windows Defender analysis
-                    </p>
+              {/* Ember ML Score */}
+              <div className="col-lg-4 col-md-12">
+                <div className={`p-4 rounded-lg border ${emberStatus.bgColor} bg-opacity-10 ${emberStatus.borderColor}`}>
+                  <div className="d-flex align-items-center">
+                    <div className={`p-3 rounded-circle me-3 ${emberStatus.bgColor} bg-opacity-20`}>
+                      <i className={`bi bi-cpu ${emberStatus.color} fs-3`}></i>
+                    </div>
+                    <div className="flex-grow-1">
+                      <h6 className="text-white mb-1">ML Analysis</h6>
+                      <h4 className={`mb-1 ${emberStatus.color}`}>
+                        {emberStatus.score !== undefined ? `${(emberStatus.score * 100).toFixed(1)}%` : 'N/A'}
+                      </h4>
+                      <p className="text-gray-400 mb-0 small">
+                        Ember ML Model: {emberStatus.prediction}
+                      </p>
+                    </div>
                   </div>
-                </div>
-                <div className={`badge px-3 py-2 ${
-                  amsiClean && defenderClean ? 'bg-success' : 'bg-danger'
-                }`}>
-                  {amsiClean && defenderClean ? 'CLEAN' : 'THREATS DETECTED'}
                 </div>
               </div>
             </div>

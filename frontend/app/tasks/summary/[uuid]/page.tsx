@@ -13,7 +13,6 @@ import '@/app/styles/tabs.css';
 // Import our new components
 import {
   TaskSummaryHeader,
-  FileAnalysisHeader,
   SecurityStatusOverview,
   KeyMetrics,
   SectionsTable,
@@ -175,14 +174,11 @@ export default function TaskSummaryPageRefactored({ params }: { params: { uuid: 
         {/* Header Section */}
         <TaskSummaryHeader className="mb-6" />
 
-        {/* File Analysis Header */}
-        <FileAnalysisHeader data={data} className="mb-6" />
+        {/* Key Metrics - Moved to top */}
+        <KeyMetrics data={data} className="mb-6" />
 
         {/* Security Status Overview */}
         <SecurityStatusOverview data={data} className="mb-6" />
-
-        {/* Key Metrics */}
-        <KeyMetrics data={data} className="mb-6" />
 
         {/* Main Content Tabs */}
         <div className="row mb-6">
@@ -250,6 +246,10 @@ export default function TaskSummaryPageRefactored({ params }: { params: { uuid: 
                             <div className="card-body">
                               <div className="space-y-4">
                                 <div className="d-flex justify-content-between py-3 border-bottom border-gray-600">
+                                  <span className="text-gray-400">File Name</span>
+                                  <span className="text-white fw-medium">{data.file_name || 'N/A'}</span>
+                                </div>
+                                <div className="d-flex justify-content-between py-3 border-bottom border-gray-600">
                                   <span className="text-gray-400">File Type</span>
                                   <span className="text-white fw-medium">{data.file_type || 'N/A'}</span>
                                 </div>
@@ -299,6 +299,44 @@ export default function TaskSummaryPageRefactored({ params }: { params: { uuid: 
                             </div>
                           </div>
                         </div>
+
+                        {/* LLM Summary Section - Only show if llm_summary exists */}
+                        {data.llm_summary && (
+                          <div className="row g-4 mt-4">
+                            <div className="col-12">
+                              <div className="card bg-gray-800 border-gray-700">
+                                <div className="card-header bg-gray-800 border-gray-700">
+                                  <h5 className="card-title text-white mb-0">
+                                    <i className="bi bi-robot me-2"></i>
+                                    AI Analysis Summary
+                                  </h5>
+                                </div>
+                                <div className="card-body">
+                                  <div 
+                                    className="text-gray-300"
+                                    dangerouslySetInnerHTML={{ 
+                                      __html: data.llm_summary
+                                        // Convert **bold** to <strong>bold</strong>
+                                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                                        // Convert *italic* to <em>italic</em>
+                                        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                                        // Convert `code` to <code>code</code>
+                                        .replace(/`(.*?)`/g, '<code class="bg-gray-600 px-1 rounded text-sm">$1</code>')
+                                        // Convert ### headers to h6
+                                        .replace(/### (.*?)(\n|$)/g, '<h6 class="text-white mt-3 mb-2">$1</h6>')
+                                        // Convert ## headers to h5
+                                        .replace(/## (.*?)(\n|$)/g, '<h5 class="text-white mt-4 mb-2">$1</h5>')
+                                        // Convert # headers to h4
+                                        .replace(/# (.*?)(\n|$)/g, '<h4 class="text-white mt-4 mb-3">$1</h4>')
+                                        // Convert line breaks to <br>
+                                        .replace(/\n/g, '<br />')
+                                    }}
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}

@@ -41,15 +41,15 @@ export const KeyMetrics: React.FC<KeyMetricsProps> = ({
       description: entropyStatus.description
     },
     {
-      icon: 'bi-layers',
-      value: (data.sections?.length || 0).toString(),
-      label: 'File Sections',
-      color: 'text-warning'
+      icon: 'bi-cpu',
+      value: data.architecture || 'N/A',
+      label: 'Architecture',
+      color: 'text-info'
     },
     {
-      icon: 'bi-code-square',
-      value: (data.imports?.length || 0).toString(),
-      label: 'Import Libraries',
+      icon: 'bi-file-earmark-code',
+      value: data.file_type || 'N/A',
+      label: 'File Type',
       color: 'text-success'
     }
   ];

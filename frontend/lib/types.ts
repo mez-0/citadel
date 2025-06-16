@@ -190,6 +190,8 @@ export interface PayloadData {
   packers?: unknown[];
   sign_tools?: unknown[];
   tools?: unknown[];
+  // LLM generated summary in markdown format
+  llm_summary?: string;
 }
 
 export interface SectionDataItem {
