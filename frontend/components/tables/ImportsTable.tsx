@@ -54,6 +54,12 @@ export const ImportsTable: React.FC<ImportsTableProps> = ({
       )
     },
     { 
+      field: 'bind', 
+      headerName: 'Bind', 
+      flex: 1,
+      cellClass: 'text-gray-300'
+    },
+    { 
       field: 'ordinal', 
       headerName: 'Ordinal', 
       flex: 1,

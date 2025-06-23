@@ -46,13 +46,15 @@ export const CapaReportModal: React.FC<CapaReportModalProps> = ({
     <div 
       className="fixed-top w-100 h-100 d-flex align-items-center justify-content-center"
       style={{
-        backgroundColor: 'rgba(0, 0, 0, 0.75)',
+        backgroundColor: 'rgba(17, 24, 39, 0.98)', // Tailwind gray-900 with high opacity
         backdropFilter: 'blur(4px)',
-        zIndex: 1050
+        zIndex: 1050,
+        // Fallback for any light backgrounds
+        background: 'rgba(17, 24, 39, 0.98) !important',
       }}
       onClick={handleBackdropClick}
     >
-      <div className="position-relative border-0 shadow-lg rounded-lg bg-gray-800 border-gray-700 mx-4 my-4" style={{ maxWidth: '900px', width: '100%', maxHeight: '90vh' }}>
+      <div className="position-relative border-0 shadow-lg rounded-lg bg-gray-800 border-gray-700 mx-4 my-4" style={{ maxWidth: '900px', width: '100%', maxHeight: '90vh', backgroundColor: '#1f2937' }}>
         {/* Modal Header */}
         <div className="sticky-top bg-gray-800 border-bottom border-gray-700 px-4 py-3 rounded-top">
           <div className="d-flex justify-content-between align-items-start">
@@ -86,8 +88,8 @@ export const CapaReportModal: React.FC<CapaReportModalProps> = ({
             {/* MITRE ATT&CK Techniques */}
             {report.mitre_techniques.length > 0 && (
               <div className="col-12">
-                <div className="card bg-gray-700 border-gray-600">
-                  <div className="card-header bg-gray-700 border-gray-600">
+                <div className="card bg-gray-800 border-gray-700">
+                  <div className="card-header bg-gray-800 border-gray-700">
                     <h6 className="card-title text-white mb-0 d-flex align-items-center">
                       <i className="bi bi-exclamation-triangle me-2 text-danger"></i>
                       MITRE ATT&CK Techniques
@@ -125,8 +127,8 @@ export const CapaReportModal: React.FC<CapaReportModalProps> = ({
             {/* Malware Behavior Catalog */}
             {report.malware_behaviour_catalogs.length > 0 && (
               <div className="col-12">
-                <div className="card bg-gray-700 border-gray-600">
-                  <div className="card-header bg-gray-700 border-gray-600">
+                <div className="card bg-gray-800 border-gray-700">
+                  <div className="card-header bg-gray-800 border-gray-700">
                     <h6 className="card-title text-white mb-0 d-flex align-items-center">
                       <i className="bi bi-bookmark me-2 text-success"></i>
                       Malware Behavior Catalog
@@ -160,8 +162,8 @@ export const CapaReportModal: React.FC<CapaReportModalProps> = ({
             {/* References */}
             {report.references.length > 0 && (
               <div className="col-12">
-                <div className="card bg-gray-700 border-gray-600">
-                  <div className="card-header bg-gray-700 border-gray-600">
+                <div className="card bg-gray-800 border-gray-700">
+                  <div className="card-header bg-gray-800 border-gray-700">
                     <h6 className="card-title text-white mb-0 d-flex align-items-center">
                       <i className="bi bi-link-45deg me-2 text-info"></i>
                       References
@@ -198,8 +200,8 @@ export const CapaReportModal: React.FC<CapaReportModalProps> = ({
             {/* Rule Details */}
             {report.rule && (
               <div className="col-12">
-                <div className="card bg-gray-700 border-gray-600">
-                  <div className="card-header bg-gray-700 border-gray-600">
+                <div className="card bg-gray-800 border-gray-700">
+                  <div className="card-header bg-gray-800 border-gray-700">
                     <h6 className="card-title text-white mb-0 d-flex align-items-center">
                       <i className="bi bi-code-slash me-2 text-warning"></i>
                       Detection Rule

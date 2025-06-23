@@ -52,86 +52,21 @@ const MaliciousBytesCard: React.FC<MaliciousBytesCardProps> = ({
         <div className="row g-4">
           {/* ASCII Hex Representation */}
           <div className="col-12">
-            <h6 className="text-gray-400 mb-3 d-flex align-items-center">
+            <h6 className="text-gray-400 mb-2 d-flex align-items-center">
               <i className="bi bi-filetype-txt me-2"></i>
               ASCII Hex Representation
             </h6>
-            <div className="bg-gray-900 p-4 rounded-lg border border-gray-600 position-relative">
-              <div className="d-flex justify-content-between align-items-center mb-3">
-                <span className="text-gray-400 small fw-medium">
-                  Hexadecimal View with ASCII
-                </span>
-                <button 
-                  className="btn btn-sm btn-outline-secondary d-flex align-items-center"
-                  onClick={handleCopy}
-                >
-                  <i className="bi bi-clipboard me-1"></i>
-                  Copy
-                </button>
-              </div>
-              <pre 
+            <pre 
                 className="text-gray-300 mb-0 small overflow-auto border border-gray-700 rounded p-3 bg-gray-800" 
                 style={{ 
                   maxHeight: '300px',
-                  fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+                  fontFamily: 'ui-monospace, SFMono-Regular, \"SF Mono\", Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace',
                   lineHeight: '1.5',
                   fontSize: '0.8rem'
                 }}
               >
                 {data.ascii_byte_representation}
               </pre>
-            </div>
-          </div>
-
-          {/* Entropy Analysis */}
-          <div className="col-12">
-            <div className="p-4 rounded-lg bg-gray-900 border border-gray-600">
-              <h6 className="text-gray-400 mb-3 d-flex align-items-center">
-                <i className="bi bi-bar-chart me-2"></i>
-                Byte Pattern Analysis
-              </h6>
-              <div className="row g-3">
-                <div className="col-md-6">
-                  <div className="text-center p-3 rounded bg-gray-800 border border-gray-700">
-                    <div className={`fs-2 mb-2 fw-bold ${risk.color}`}>
-                      {data.entropy.toFixed(3)}
-                    </div>
-                    <div className="text-white fw-medium mb-1">Entropy Score</div>
-                    <div className="text-gray-400 small">
-                      {risk.level}
-                    </div>
-                    <div className="mt-2">
-                      <div className="progress" style={{ height: '6px' }}>
-                        <div 
-                          className={`progress-bar ${risk.color.replace('text-', 'bg-')}`}
-                          role="progressbar" 
-                          style={{ width: `${Math.min(data.entropy / 8 * 100, 100)}%` }}
-                          aria-valuenow={data.entropy}
-                          aria-valuemin={0}
-                          aria-valuemax={8}
-                        ></div>
-                      </div>
-                      <div className="text-gray-400 small mt-1">
-                        Scale: 0 (Low) - 8 (High)
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="col-md-6">
-                  <div className="text-center p-3 rounded bg-gray-800 border border-gray-700">
-                    <div className="text-warning fs-2 mb-2">
-                      <i className="bi bi-exclamation-triangle"></i>
-                    </div>
-                    <div className="text-white fw-medium mb-1">Risk Assessment</div>
-                    <div className="text-gray-400 small mb-2">Malicious Pattern Detected</div>
-                    <div className="badge bg-danger px-3 py-2">
-                      <i className="bi bi-shield-exclamation me-1"></i>
-                      MALICIOUS
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -158,17 +93,6 @@ export const MaliciousBytesAnalysis: React.FC<MaliciousBytesAnalysisProps> = ({
           </h5>
         </div>
         <div className="card-body">
-          <div className="alert alert-warning border border-warning bg-warning bg-opacity-10 mb-4">
-            <div className="d-flex align-items-start">
-              <i className="bi bi-exclamation-triangle text-warning me-2 mt-1"></i>
-              <div className="text-warning">
-                <strong>Security Alert: </strong>
-                This section displays detected malicious byte patterns and their characteristics. 
-                These patterns have been identified as potentially harmful or suspicious.
-              </div>
-            </div>
-          </div>
-          
           <div className="row g-4">
             {/* Zero-X Malicious Bytes */}
             {zeroXMaliciousBytes && (

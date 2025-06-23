@@ -247,7 +247,11 @@ export default function TaskSummaryPageRefactored({ params }: { params: { uuid: 
                               <div className="space-y-4">
                                 <div className="d-flex justify-content-between py-3 border-bottom border-gray-600">
                                   <span className="text-gray-400">File Name</span>
-                                  <span className="text-white fw-medium">{data.file_name || 'N/A'}</span>
+                                  <span className="text-white fw-medium text-break break-all">{data.file_name || 'N/A'}</span>
+                                </div>
+                                <div className="d-flex justify-content-between py-3 border-bottom border-gray-600">
+                                  <span className="text-gray-400">Internal Name</span>
+                                  <span className="text-white fw-medium text-break break-all">{data.internal_name || 'N/A'}</span>
                                 </div>
                                 <div className="d-flex justify-content-between py-3 border-bottom border-gray-600">
                                   <span className="text-gray-400">File Type</span>
@@ -468,20 +472,43 @@ export default function TaskSummaryPageRefactored({ params }: { params: { uuid: 
                                   <AgGridReact
                                     rowData={Object.entries(data.optional_headers).map(([key, value]) => ({
                                       name: key,
-                                      value: typeof value === 'boolean' ? value.toString() : value
+                                      value:
+                                        typeof value === 'boolean'
+                                          ? value
+                                            ? 'Yes'
+                                            : 'No'
+                                          : value === null || value === undefined
+                                            ? 'N/A'
+                                            : value
                                     }))}
                                     columnDefs={[
-                                      { 
-                                        field: 'name', 
-                                        headerName: 'Property', 
+                                      {
+                                        field: 'name',
+                                        headerName: 'Property',
                                         flex: 1,
-                                        valueFormatter: (params) => {
+                                        valueFormatter: (params: { value: string }) => {
                                           return params.value
                                             .replace(/([A-Z])/g, ' $1')
                                             .replace(/^./, (str: string) => str.toUpperCase());
                                         }
                                       },
-                                      { field: 'value', headerName: 'Value', flex: 1 }
+                                      {
+                                        field: 'value',
+                                        headerName: 'Value',
+                                        flex: 1,
+                                        cellRenderer: (params: { value: string }) => {
+                                          if (params.value === 'Yes') {
+                                            return <span className="badge bg-success">Yes</span>;
+                                          }
+                                          if (params.value === 'No') {
+                                            return <span className="badge bg-danger">No</span>;
+                                          }
+                                          if (params.value === 'N/A') {
+                                            return <span className="text-gray-400">N/A</span>;
+                                          }
+                                          return <span>{params.value}</span>;
+                                        }
+                                      }
                                     ]}
                                     defaultColDef={{
                                       sortable: true,
