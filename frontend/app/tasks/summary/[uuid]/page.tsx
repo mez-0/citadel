@@ -2,7 +2,6 @@
 import React from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { ImportLibrariesChart } from "@/components/charts/ImportLibrariesChart";
-import { EntropyAnalysisChart } from "@/components/charts/EntropyAnalysisChart";
 import { FunctionCategoryChart, RawFunctionMapping } from '@/components/charts/FunctionCategoryChart';
 import { SimilarTLSHScatterChart, SimilarTLSHHash } from '@/components/charts/SimilarTLSHScatterChart';
 import { AgGridReact } from 'ag-grid-react';
@@ -349,28 +348,6 @@ export default function TaskSummaryPageRefactored({ params }: { params: { uuid: 
                   {activeTab === "analysis" && (
                     <div className="tab-pane show active" id="analysis" role="tabpanel">
                       <div className="row g-4">
-                        {/* Entropy Analysis */}
-                        <div className="col-12">
-                          <div className="card bg-gray-800 border-gray-700">
-                            <div className="card-header bg-gray-800 border-gray-700">
-                              <div className="d-flex justify-content-between align-items-center">
-                                <h5 className="card-title text-white mb-0">
-                                  <i className="bi bi-graph-up me-2"></i>
-                                  Entropy Analysis
-                                </h5>
-                                <div className="d-flex align-items-center">
-                                  <div className={`badge ${(data.entropy || 0) > 7 ? 'bg-danger' : (data.entropy || 0) > 6 ? 'bg-warning' : 'bg-success'} px-3 py-2 me-2`}>
-                                    Score: {(data.entropy || 0).toFixed(2)}
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="card-body">
-                              <EntropyAnalysisChart fileEntropy={data.entropy || 0} />
-                            </div>
-                          </div>
-                        </div>
-
                         {/* Import Libraries Chart */}
                         <div className="col-12">
                           <div className="card bg-gray-800 border-gray-700">

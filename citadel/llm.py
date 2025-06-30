@@ -26,8 +26,9 @@ def summarise_task_with_openai(task: Task, payload: PayloadFile) -> str:
     """
 
     api_key = get_openai_env_key()
+
     if not api_key:
-        raise ValueError("OPENAI_API_KEY is not set")
+        return ""
 
     client = OpenAI(api_key=api_key)
 

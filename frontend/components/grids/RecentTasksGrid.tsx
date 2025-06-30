@@ -51,8 +51,9 @@ const StatusBadgeRenderer = (params: ICellRendererParams) => {
         color: '#ffffff'
       };
     } else {
-      badgeClass = 'badge';
-      displayValue = score.toFixed(4);
+      // Convert float to percentage (multiply by 100)
+      const percentage = (score * 100).toFixed(1);
+      displayValue = `${percentage}%`;
       
       // Create color gradient from green (0) to red (1)
       const clampedScore = Math.max(0, Math.min(1, score));
@@ -64,11 +65,87 @@ const StatusBadgeRenderer = (params: ICellRendererParams) => {
       const luminance = (0.299 * red + 0.587 * green + 0.114 * blue) / 255;
       const textColor = luminance > 0.5 ? '#000000' : '#ffffff';
       
-      customStyle = {
-        backgroundColor: `rgb(${red}, ${green}, ${blue})`,
-        color: textColor,
-        border: 'none'
-      };
+      // Create enhanced progress bar container
+      return (
+        <div style={{
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          position: 'relative',
+          padding: '0 12px'
+        }}>
+          {/* Background bar with subtle gradient */}
+          <div style={{
+            position: 'absolute',
+            left: '12px',
+            right: '12px',
+            height: '12px',
+            background: 'linear-gradient(180deg, #2d3748 0%, #1a202c 100%)',
+            borderRadius: '6px',
+            border: '1px solid #4a5568',
+            boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.3)',
+            zIndex: 1
+          }} />
+          
+          {/* Progress bar with enhanced styling */}
+          <div style={{
+            position: 'absolute',
+            left: '12px',
+            height: '12px',
+            width: `${clampedScore * 100}%`,
+            background: `linear-gradient(180deg, rgb(${Math.min(255, red + 40)}, ${Math.min(255, green + 40)}, ${blue}) 0%, rgb(${red}, ${green}, ${blue}) 100%)`,
+            borderRadius: '6px',
+            border: '1px solid rgba(255,255,255,0.1)',
+            boxShadow: `
+              0 1px 3px rgba(0,0,0,0.3),
+              inset 0 1px 0 rgba(255,255,255,0.1),
+              0 0 8px rgba(${red}, ${green}, ${blue}, 0.3)
+            `,
+            zIndex: 2,
+            transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+            overflow: 'hidden'
+          }}>
+            {/* Shimmer effect overlay */}
+            <div style={{
+              position: 'absolute',
+              top: 0,
+              left: '-100%',
+              width: '100%',
+              height: '100%',
+              background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)',
+              animation: 'shimmer 2s infinite',
+              zIndex: 3
+            }} />
+          </div>
+          
+          {/* Percentage text with enhanced styling */}
+          <span style={{
+            position: 'absolute',
+            right: '12px',
+            fontSize: '0.75rem',
+            fontWeight: '700',
+            color: textColor,
+            zIndex: 3,
+            textShadow: `
+              0 1px 2px rgba(0,0,0,0.8),
+              0 0 4px rgba(${red}, ${green}, ${blue}, 0.5)
+            `,
+            letterSpacing: '0.025em',
+            fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace'
+          }}>
+            {displayValue}
+          </span>
+          
+          {/* CSS Animation for shimmer effect */}
+          <style jsx>{`
+            @keyframes shimmer {
+              0% { left: -100%; }
+              100% { left: 100%; }
+            }
+          `}</style>
+        </div>
+      );
     }
   } else if (field === 'task_status') {
     if (value === 'COMPLETED') {
